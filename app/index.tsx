@@ -51,14 +51,12 @@ export default function App() {
   }
 
   return (
-    //Show list of nicely formatted projects
-    <View>
+    <View style={styles.container}>
       <FlatList
         data={projects}
         keyExtractor={(item) => item.name.toString()}
         renderItem={({ item }) => (
           <View>
-            {/* <Text>{item.name}</Text> */}
             <Link href={`/projects/${item.name}`}>
               <Text>{item.name}</Text>
             </Link>
@@ -66,8 +64,6 @@ export default function App() {
         )}
       />
       <View>
-        <Text>Create a new project</Text>
-        <Text>Project name:</Text>
         <TextInput placeholder="Project name" onChangeText={(text) => setProjectName(text)} />
         <Button title="Create" onPress={createProject} />
       </View>
@@ -77,7 +73,6 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
