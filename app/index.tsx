@@ -2,18 +2,22 @@ import "react-native-url-polyfill/auto";
 import { Button, FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import { useEffect, useState } from "react";
 import { Link } from "expo-router";
+import { apiService } from "../utils/apiService";
+
+interface Project {
+  name: string;
+}
 
 export default function App() {
   //hard coded uuid for user id for now
 
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [projectName, setProjectName] = useState("");
   const [loading, setLoading] = useState(true);
-  const apiURL = "https://geschenk-api-production.up.railway.app";
 
   // Fetch all project rows
   const fetchProjects = async () => {
-    const beProjects = await (await fetch(`${apiURL}/projects`)).json();
+    const beProjects = await apiService.getProjects();
 
     setProjects(beProjects);
     setLoading(false);
@@ -21,15 +25,7 @@ export default function App() {
 
   // Create a new project
   const createProject = async () => {
-    const response = await fetch(`${apiURL}/projects`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: projectName,
-      }),
-    });
+    const response = await apiService.createProject({ projectName });
 
     if (response.ok) {
       fetchProjects();
