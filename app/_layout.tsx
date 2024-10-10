@@ -16,9 +16,9 @@ export default function RootLayout() {
       <Stack.Screen name="index" options={{ title: "Projects" }} />
       // show the ID value in the stack header
       <Stack.Screen
-        name="projects/[id]"
+        name="projects/[name]/[id]"
         options={({ route }: { route: { params?: any } }) => ({
-          title: decodeURIComponent(route.params?.id),
+          title: decodeURIComponent(route.params?.name),
         })}
       />
     </Stack>

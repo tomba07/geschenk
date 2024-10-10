@@ -18,7 +18,12 @@ const createProject = async ({ projectName }: { projectName: String }): Promise<
   });
 };
 
+const getProjectDetails = async ({ projectId }: { projectId: Number }) => {
+  return await (await fetch(`${API_BASE_URL}/projects/${projectId}`)).json();
+};
+
 export const apiService = {
   getProjects,
   createProject,
+  getProjectDetails,
 };

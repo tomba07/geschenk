@@ -5,6 +5,7 @@ import { Link } from "expo-router";
 import { apiService } from "../utils/apiService";
 
 interface Project {
+    id: Number;
   name: string;
 }
 
@@ -53,7 +54,7 @@ export default function App() {
         keyExtractor={(item) => item.name.toString()}
         renderItem={({ item }) => (
           <View>
-            <Link href={`/projects/${item.name}`}>
+            <Link href={`/projects/${item.name}/${item.id}`}>
               <Text>{item.name}</Text>
             </Link>
           </View>
