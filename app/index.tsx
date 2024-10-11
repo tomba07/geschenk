@@ -4,7 +4,7 @@ import { Link } from "expo-router";
 import { apiService } from "../utils/apiService";
 
 interface Project {
-    id: Number;
+  id: Number;
   name: string;
 }
 
@@ -48,29 +48,29 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <TextInput placeholder="Project name" onChangeText={(text) => setProjectName(text)} />
+      <Button title="Create" onPress={createProject} />
       <FlatList
         data={projects}
         keyExtractor={(item) => item.name.toString()}
         renderItem={({ item }) => (
-          <View>
-            <Link href={`/projects/${item.name}/${item.id}`}>
-              <Text>{item.name}</Text>
-            </Link>
-          </View>
+          <Link href={`/projects/${item.name}/${item.id}`}>
+            <Text style={styles.item}>{item.name}</Text>
+          </Link>
         )}
       />
-      <View>
-        <TextInput placeholder="Project name" onChangeText={(text) => setProjectName(text)} />
-        <Button title="Create" onPress={createProject} />
-      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
+    flex: 1,
+    padding: 22,
+  },
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
   },
 });

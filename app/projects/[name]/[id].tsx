@@ -2,7 +2,7 @@ import { apiService } from "@/utils/apiService";
 import SecretSantaMatcher from "@/utils/SecretSantaMatcher";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Button } from "react-native";
+import { View, Text, StyleSheet, Button, FlatList } from "react-native";
 
 export interface Participant {
   name: string;
@@ -55,10 +55,13 @@ export default function DetailsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text>Details of project {projectName} </Text>
       <Text>Participants:</Text>
       {loading && <Text>Loading...</Text>}
-      {!loading && projectDetails.participants.map((participant, index) => <Text key={index}>{participant.name}</Text>)}
+      <FlatList
+        data={projectDetails.participants}
+        keyExtractor={(participant) => participant.name.toString()}
+        renderItem={({ item }) => <Text style={styles.item}>{item.name}</Text>}
+      />
       <Button title="Assign" onPress={assignParticipants} />
       {assignments.length > 0 && <Text>Assignments:</Text>}
       {assignments.map((assignment, index) => (
@@ -69,9 +72,15 @@ export default function DetailsScreen() {
     </View>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
-    justifyContent: "center",
-    alignItems: "center",
+    flex: 1,
+    padding: 22,
+  },
+  item: {
+    padding: 10,
+    fontSize: 18,
+    height: 44,
   },
 });
