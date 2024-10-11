@@ -12,9 +12,15 @@ export interface ProjectDetails {
   id: Number;
   name: string;
   participants: Participant[];
+  assignments: Assignment[];
+}
+
+export interface SimplifiedAssignment {
+  fromName: string;
+  toName: string;
 }
 
 export interface Assignment {
-  from: string;
-  to: string;
+  fromName: string;
+  toName: string;
 }

@@ -1,4 +1,4 @@
-import { Assignment, Participant } from "./interfaces";
+import { SimplifiedAssignment, Participant } from "./interfaces";
 
 // Function to shuffle an array
 function shuffle(array: string[]): string[] {
@@ -45,7 +45,7 @@ function findAssignment(
 }
 
 // Function to find matches for Secret Santa
-export function findMatches(participants: Participant[]): Assignment[] {
+export function findMatches(participants: Participant[]): SimplifiedAssignment[] {
   const names = participants.map((p) => p.name);
   const exclusions: [string, string][] = [];
 
@@ -70,7 +70,7 @@ export function findMatches(participants: Participant[]): Assignment[] {
   const assignment = findAssignment(shuffledNames, shuffledNames.slice(), [], exclusionMap);
 
   if (assignment) {
-    return assignment.map(([giver, receiver]) => ({ from: giver, to: receiver }));
+    return assignment.map(([giver, receiver]) => ({ fromName: giver, toName: receiver }));
   } else {
     console.error("Not all participants could be matched.");
     throw new Error("Not all participants could be matched.");

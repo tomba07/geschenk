@@ -1,5 +1,5 @@
 import { apiService } from "@/utils/apiService";
-import { Assignment, Participant, ProjectDetails } from "@/utils/interfaces";
+import { Participant, ProjectDetails, SimplifiedAssignment } from "@/utils/interfaces";
 import { findMatches } from "@/utils/SecretSantaMatcher";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -14,26 +14,41 @@ export default function DetailsScreen() {
     id: projectIdAsNum,
     name: projectName,
     participants: [],
+    assignments: [],
   });
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
 
-  const fetchProjects = async ({ projectId }: { projectId: Number }) => {
+  const fetchProjectDetails = async ({ projectId }: { projectId: Number }) => {
     setProjectDetails(await apiService.getProjectDetails({ projectId }));
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchProjects({ projectId: projectIdAsNum });
+    fetchProjectDetails({ projectId: projectIdAsNum });
   }, []);
 
-  const assignParticipants = () => {
+  const assignParticipants = async () => {
     const participants: Participant[] = projectDetails.participants.map((participant) => {
       return { name: participant.name, excludes: [] };
     });
 
-    const assignments: Assignment[] = findMatches(participants);
+    const assignments: SimplifiedAssignment[] = findMatches(participants);
+    await createAssignments(assignments);
 
-    setAssignments(assignments);
+    fetchProjectDetails({ projectId: projectIdAsNum });
+  };
+
+  const createAssignments = async (simplifiedAssignments: SimplifiedAssignment[]) => {
+    const assignments = simplifiedAssignments.map((assignment) => {
+      return {
+        ...assignment,
+        projectId: projectIdAsNum,
+      };
+    });
+    try {
+      await apiService.createAssignments(assignments);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -48,10 +63,10 @@ export default function DetailsScreen() {
           </View>
         )}
       />
-      {assignments.length > 0 && <Text>Assignments:</Text>}
-      {assignments.map((assignment, index) => (
+      {projectDetails.assignments.length > 0 && <Text>Assignments:</Text>}
+      {projectDetails.assignments.map((assignment, index) => (
         <Text key={index}>
-          {assignment.from} - {assignment.to}
+          {assignment.fromName} - {assignment.toName}
         </Text>
       ))}
 
