@@ -1,5 +1,5 @@
-import { Assignment, Participant } from "@/app/projects/[name]/[id]";
 import Graph from "graphology";
+import { Assignment, Participant } from "./interfaces";
 
 interface NodeAttributes {
   excludes: string[];

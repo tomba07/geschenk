@@ -5,11 +5,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useRouter } from "expo-router";
 import { apiService } from "../utils/apiService";
-
-interface Project {
-  id: Number;
-  name: string;
-}
+import { Project } from "@/utils/interfaces";
 
 export default function App() {
   const [projects, setProjects] = useState<Project[]>([]);

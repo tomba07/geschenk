@@ -1,24 +1,9 @@
 import { apiService } from "@/utils/apiService";
+import { Assignment, Participant, ProjectDetails } from "@/utils/interfaces";
 import SecretSantaMatcher from "@/utils/SecretSantaMatcher";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Button, FlatList } from "react-native";
-
-export interface Participant {
-  name: string;
-  excludes: string[];
-}
-
-interface ProjectDetails {
-  id: Number;
-  name: string;
-  participants: Participant[];
-}
-
-export interface Assignment {
-  from: string;
-  to: string;
-}
 
 export default function DetailsScreen() {
   let { id: projectId, name: projectName } = useLocalSearchParams();
