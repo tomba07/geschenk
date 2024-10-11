@@ -1,4 +1,3 @@
-import "react-native-url-polyfill/auto";
 import { Button, FlatList, StyleSheet, Text, TextInput, View } from "react-native";
 import { useEffect, useState } from "react";
 import { Link } from "expo-router";
