@@ -68,11 +68,9 @@ export default function App() {
 
         <BottomSheet ref={bottomSheetRef} index={-1} snapPoints={["25%", "50%"]}>
           <View style={styles.sheetContent}>
-            {/* X button to close the sheet */}
             <TouchableOpacity onPress={() => bottomSheetRef.current?.close()} style={styles.closeButton}>
               <Ionicons name="close" size={24} color="black" />
             </TouchableOpacity>
-
             <Text style={styles.sheetTitle}>Create Project</Text>
             <TextInput
               style={styles.input}
@@ -113,13 +111,11 @@ const styles = StyleSheet.create({
   },
   sheetContent: {
     flex: 1,
-    padding: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    padding: 10
   },
   closeButton: {
     position: "absolute",
-    top: 10,
+    top: 0,
     right: 10,
     zIndex: 1,
     padding: 10,
