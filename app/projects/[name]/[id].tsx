@@ -60,7 +60,11 @@ export default function DetailsScreen() {
       <FlatList
         data={projectDetails.participants}
         keyExtractor={(participant) => participant.name.toString()}
-        renderItem={({ item }) => <Text style={styles.item}>{item.name}</Text>}
+        renderItem={({ item }) => (
+          <View style={styles.itemContainer}>
+            <Text style={styles.item}>{item.name}</Text>
+          </View>
+        )}
       />
       <Button title="Assign" onPress={assignParticipants} />
       {assignments.length > 0 && <Text>Assignments:</Text>}
@@ -78,9 +82,15 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 22,
   },
-  item: {
+  itemContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+  },
+  item: {
     fontSize: 18,
-    height: 44,
   },
 });

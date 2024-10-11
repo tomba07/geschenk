@@ -1,8 +1,10 @@
-import { Button, FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { StyleSheet, TextInput, TouchableOpacity, View, Text, FlatList } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useRouter } from "expo-router";
 import { apiService } from "../utils/apiService";
-import { Ionicons } from "@expo/vector-icons";
 
 interface Project {
   id: Number;
@@ -10,39 +12,37 @@ interface Project {
 }
 
 export default function App() {
-  //hard coded uuid for user id for now
-
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectName, setProjectName] = useState("");
   const [loading, setLoading] = useState(true);
+  const bottomSheetRef = useRef<BottomSheet>(null);
   const router = useRouter();
 
-  // Fetch all project rows
   const fetchProjects = async () => {
     const beProjects = await apiService.getProjects();
-
     setProjects(beProjects);
     setLoading(false);
   };
 
-  // Create a new project
   const createProject = async () => {
     const response = await apiService.createProject({ projectName });
 
     if (response.ok) {
+      setProjectName("");
+      bottomSheetRef.current?.close();
       fetchProjects();
     } else {
       alert("Failed to create project");
     }
   };
 
-  const handlePress = (item: Project) => {
-    router.push(`/projects/${item.name}/${item.id.toString()}` as const);
-  };
-
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  const handlePress = (item: Project) => {
+    router.push(`/projects/${item.name}/${item.id.toString()}` as const);
+  };
 
   if (loading) {
     return (
@@ -53,36 +53,52 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      <TextInput placeholder="Project name" onChangeText={(text) => setProjectName(text)} />
-      <Button title="Create" onPress={createProject} />
-      <FlatList
-        data={projects}
-        keyExtractor={(item) => item.name.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handlePress(item)} style={styles.itemContainer}>
-            <Text style={styles.item}>{item.name}</Text>
-            {/* Arrow icon */}
-            <Ionicons name="chevron-forward-outline" size={20} color="gray" />
-          </TouchableOpacity>
-        )}
-      />
-    </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <FlatList
+          data={projects}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => handlePress(item)} style={styles.itemContainer}>
+              <Text style={styles.item}>{item.name}</Text>
+              <Ionicons name="chevron-forward-outline" size={20} color="gray" />
+            </TouchableOpacity>
+          )}
+        />
+
+        <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()} style={styles.floatingButton}>
+          <Ionicons name="add-circle" size={60} color="#007AFF" />
+        </TouchableOpacity>
+
+        <BottomSheet ref={bottomSheetRef} index={-1} snapPoints={["25%", "50%"]}>
+          <View style={styles.sheetContent}>
+            {/* X button to close the sheet */}
+            <TouchableOpacity onPress={() => bottomSheetRef.current?.close()} style={styles.closeButton}>
+              <Ionicons name="close" size={24} color="black" />
+            </TouchableOpacity>
+
+            <Text style={styles.sheetTitle}>Create Project</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter project name"
+              onChangeText={(text) => setProjectName(text)}
+              value={projectName}
+            />
+            <TouchableOpacity onPress={createProject} style={styles.createButton}>
+              <Text style={styles.createButtonText}>Create</Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheet>
+      </View>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 22,
-    backgroundColor: "#fff",
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    paddingLeft: 8,
-    marginBottom: 12,
+    padding: 22,
+    backgroundColor: "#eee",
   },
   itemContainer: {
     flexDirection: "row",
@@ -94,5 +110,48 @@ const styles = StyleSheet.create({
   },
   item: {
     fontSize: 18,
+  },
+  floatingButton: {
+    position: "absolute",
+    bottom: 20,
+    right: 20,
+  },
+  sheetContent: {
+    flex: 1,
+    padding: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 1,
+    padding: 10,
+  },
+  sheetTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+    width: "100%",
+    borderRadius: 5,
+  },
+  createButton: {
+    backgroundColor: "#007AFF",
+    padding: 10,
+    borderRadius: 5,
+    width: "100%",
+    alignItems: "center",
+  },
+  createButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
