@@ -38,7 +38,6 @@ export default function DetailsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text>Participants:</Text>
       {loading && <Text>Loading...</Text>}
       <FlatList
         data={projectDetails.participants}
@@ -66,7 +65,6 @@ export default function DetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 22,
   },
   itemContainer: {
     flexDirection: "row",
