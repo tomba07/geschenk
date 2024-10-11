@@ -1,72 +1,78 @@
-import Graph from "graphology";
 import { Assignment, Participant } from "./interfaces";
 
-interface NodeAttributes {
-  excludes: string[];
+// Function to shuffle an array
+function shuffle(array: string[]): string[] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+  }
+  return array;
 }
 
-export default class SecretSantaMatcher {
-  private graph: Graph<NodeAttributes>;
-  private participants: Participant[];
-  private retryCount = 0;
-
-  constructor(participants: Participant[]) {
-    this.graph = new Graph<NodeAttributes>();
-    this.participants = participants;
-
-    participants.forEach((participant) => {
-      this.graph.addNode(participant.name, { excludes: participant.excludes });
-    });
-
-    participants.forEach((giver) => {
-      participants.forEach((receiver) => {
-        if (receiver.name !== giver.name && !giver.excludes.includes(receiver.name)) {
-          this.graph.addEdge(giver.name, receiver.name);
-        }
-      });
-    });
+// Helper function to check if a giver can give to a receiver
+function isValid(giver: string, receiver: string, exclusionMap: Map<string, Set<string>>): boolean {
+  if (giver === receiver) return false;
+  if (exclusionMap.has(giver) && exclusionMap.get(giver)?.has(receiver)) {
+    return false;
   }
+  return true;
+}
 
-  findMatches(): Assignment[] {
-    const matches: Record<string, string> = {};
-    const assignments: Assignment[] = [];
-    const availableGivers = new Set(this.participants.map((p) => p.name));
-    const availableReceivers = new Set(this.participants.map((p) => p.name));
+// Backtracking algorithm to find valid assignments
+function findAssignment(
+  givers: string[],
+  receivers: string[],
+  assignment: [string, string][],
+  exclusionMap: Map<string, Set<string>>
+): [string, string][] | false {
+  if (givers.length === 0) return assignment;
 
-    while (availableGivers.size > 0 && availableReceivers.size > 0) {
-      let giver = Array.from(availableGivers)[0]; // Start from the first available giver
-      let potentialReceivers = this.graph
-        .outNeighbors(giver)
-        .filter((receiver) => receiver !== giver && availableReceivers.has(receiver) && receiver !== matches[giver]);
+  const giver = givers[0];
+  const shuffledReceivers = shuffle(receivers.slice()); // Shuffle to randomize
 
-      if (potentialReceivers.length > 0) {
-        let selectedReceiver = potentialReceivers[Math.floor(Math.random() * potentialReceivers.length)];
-        matches[giver] = selectedReceiver;
-
-        assignments.push({ from: giver, to: selectedReceiver });
-
-        // Remove from the available pool
-        availableGivers.delete(giver);
-        availableReceivers.delete(selectedReceiver);
-      } else {
-        // If no available receivers, break to avoid infinite loop
-        break;
-      }
+  for (let i = 0; i < shuffledReceivers.length; i++) {
+    const receiver = shuffledReceivers[i];
+    if (isValid(giver, receiver, exclusionMap)) {
+      assignment.push([giver, receiver]);
+      const nextGivers = givers.slice(1);
+      const nextReceivers = receivers.filter((r) => r !== receiver);
+      const result = findAssignment(nextGivers, nextReceivers, assignment, exclusionMap);
+      if (result) return result;
+      assignment.pop(); // Backtrack
     }
+  }
+  return false;
+}
 
-    // Verify every participant has been matched, if not, we need to shuffle or re-run the match
-    if (assignments.length < this.participants.length) {
-      if (this.retryCount < 10) {
-        this.retryCount++;
-        console.warn("Not all participants could be matched, rerunning the match...");
-        return this.findMatches(); // Optionally re-run the matching to try again
-      }
-      else{
-        console.error("Not all participants could be matched and max retries reached.");
-        throw new Error("Not all participants could be matched.");
-      }
-    }
+// Function to find matches for Secret Santa
+export function findMatches(participants: Participant[]): Assignment[] {
+  const names = participants.map((p) => p.name);
+  const exclusions: [string, string][] = [];
 
-    return assignments;
+  // Create exclusion pairs
+  participants.forEach((participant) => {
+    participant.excludes.forEach((excluded) => {
+      exclusions.push([participant.name, excluded]);
+    });
+  });
+
+  // Create exclusion map for quick exclusion checks
+  const exclusionMap = new Map<string, Set<string>>();
+  exclusions.forEach(([a, b]) => {
+    if (!exclusionMap.has(a)) exclusionMap.set(a, new Set());
+    if (!exclusionMap.has(b)) exclusionMap.set(b, new Set());
+    exclusionMap.get(a)?.add(b);
+    exclusionMap.get(b)?.add(a);
+  });
+
+  // Shuffle the names to randomize the order of givers and receivers
+  const shuffledNames = shuffle(names.slice());
+  const assignment = findAssignment(shuffledNames, shuffledNames.slice(), [], exclusionMap);
+
+  if (assignment) {
+    return assignment.map(([giver, receiver]) => ({ from: giver, to: receiver }));
+  } else {
+    console.error("Not all participants could be matched.");
+    throw new Error("Not all participants could be matched.");
   }
 }

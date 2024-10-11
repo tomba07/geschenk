@@ -1,9 +1,9 @@
 import { apiService } from "@/utils/apiService";
 import { Assignment, Participant, ProjectDetails } from "@/utils/interfaces";
-import SecretSantaMatcher from "@/utils/SecretSantaMatcher";
+import { findMatches } from "@/utils/SecretSantaMatcher";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Button, FlatList } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
 
 export default function DetailsScreen() {
   let { id: projectId, name: projectName } = useLocalSearchParams();
@@ -19,21 +19,19 @@ export default function DetailsScreen() {
 
   const fetchProjects = async ({ projectId }: { projectId: Number }) => {
     setProjectDetails(await apiService.getProjectDetails({ projectId }));
-
     setLoading(false);
   };
 
   useEffect(() => {
     fetchProjects({ projectId: projectIdAsNum });
-  });
+  }, []);
 
   const assignParticipants = () => {
     const participants: Participant[] = projectDetails.participants.map((participant) => {
       return { name: participant.name, excludes: [] };
     });
 
-    const secretSantaMatcher = new SecretSantaMatcher(participants);
-    const assignments: Assignment[] = secretSantaMatcher.findMatches();
+    const assignments: Assignment[] = findMatches(participants);
 
     setAssignments(assignments);
   };
@@ -51,13 +49,16 @@ export default function DetailsScreen() {
           </View>
         )}
       />
-      <Button title="Assign" onPress={assignParticipants} />
       {assignments.length > 0 && <Text>Assignments:</Text>}
       {assignments.map((assignment, index) => (
         <Text key={index}>
           {assignment.from} - {assignment.to}
         </Text>
       ))}
+
+      <TouchableOpacity style={styles.floatingButton} onPress={assignParticipants}>
+        <Text style={styles.buttonText}>Assign</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -77,5 +78,18 @@ const styles = StyleSheet.create({
   },
   item: {
     fontSize: 18,
+  },
+  floatingButton: {
+    position: "absolute",
+    bottom: 40,
+    right: 40,
+    backgroundColor: "#007AFF",
+    borderRadius: 10,
+    padding: 10,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
