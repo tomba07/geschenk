@@ -2,8 +2,10 @@ import { apiService } from "@/utils/apiService";
 import { BEParticipant, Participant, ProjectDetails, SimplifiedAssignment } from "@/utils/interfaces";
 import { findMatches } from "@/utils/SecretSantaMatcher";
 import { useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, Button } from "react-native";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function DetailsScreen() {
   let { id: projectId, name: projectName } = useLocalSearchParams();
@@ -16,6 +18,8 @@ export default function DetailsScreen() {
     participants: [],
     assignments: [],
   });
+  const [participantName, setParticipantName] = useState("");
+  const bottomSheetRef = useRef<BottomSheet>(null);
 
   const fetchProjectDetails = async ({ projectId }: { projectId: Number }) => {
     setProjectDetails(await apiService.getProjectDetails({ projectId }));
@@ -27,16 +31,16 @@ export default function DetailsScreen() {
   }, []);
 
   const createParticipant = async () => {
-    const participant: BEParticipant = { name: "New Participant", projectId: projectIdAsNum };
+    const participant: BEParticipant = { name: participantName, projectId: projectIdAsNum };
 
     try {
-      await apiService.createParticipant({  participant });
+      await apiService.createParticipant({ participant });
+      setParticipantName("");
+      bottomSheetRef.current?.close();
       fetchProjectDetails({ projectId: projectIdAsNum });
     } catch (error) {
       console.error(error);
     }
-
-    await fetchProjectDetails({ projectId: projectIdAsNum });
   };
 
   const assignParticipants = async () => {
@@ -64,34 +68,69 @@ export default function DetailsScreen() {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      {loading && <Text>Loading...</Text>}
-      <FlatList
-        data={projectDetails.participants}
-        keyExtractor={(participant) => participant.name.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.itemContainer}>
-            <Text style={styles.item}>{item.name}</Text>
-          </View>
-        )}
-      />
-      {projectDetails.assignments.length > 0 && <Text>Assignments:</Text>}
-      {projectDetails.assignments.map((assignment, index) => (
-        <Text key={index}>
-          {assignment.fromName} - {assignment.toName}
-        </Text>
-      ))}
-
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.footerButton} onPress={createParticipant}>
-          <Text style={styles.buttonText}>Create</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.footerButton} onPress={assignParticipants}>
-          <Text style={styles.buttonText}>Assign</Text>
-        </TouchableOpacity>
+  if (loading) {
+    return (
+      <View>
+        <Text>Loading...</Text>
       </View>
-    </View>
+    );
+  }
+
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        <FlatList
+          data={projectDetails.participants}
+          keyExtractor={(participant) => participant.name.toString()}
+          renderItem={({ item }) => (
+            <View style={styles.itemContainer}>
+              <Text style={styles.item}>{item.name}</Text>
+            </View>
+          )}
+        />
+        {projectDetails.assignments.length > 0 && <Text>Assignments:</Text>}
+        {projectDetails.assignments.map((assignment, index) => (
+          <Text key={index}>
+            {assignment.fromName} - {assignment.toName}
+          </Text>
+        ))}
+
+        <View style={styles.footer}>
+          <TouchableOpacity style={styles.footerButton} onPress={() => bottomSheetRef.current?.expand()}>
+            <Text style={styles.buttonText}>Create Participant</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.footerButton} onPress={assignParticipants}>
+            <Text style={styles.buttonText}>Assign Participants</Text>
+          </TouchableOpacity>
+        </View>
+
+        <BottomSheet ref={bottomSheetRef} index={-1} snapPoints={["10%", "30%"]}>
+          <View style={styles.sheetContent}>
+            <View style={styles.cancelButton}>
+              <Button
+                title="Cancel"
+                onPress={() => {
+                  bottomSheetRef.current?.close();
+                  setParticipantName("");
+                }}
+              />
+            </View>
+            <View style={styles.sheetHeader}>
+              <Text style={styles.sheetTitle}>Create Participant</Text>
+              <TouchableOpacity onPress={createParticipant} style={styles.createButton}>
+                <Text style={styles.createButtonText}>Create</Text>
+              </TouchableOpacity>
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter participant name"
+              onChangeText={(text) => setParticipantName(text)}
+              value={participantName}
+            />
+          </View>
+        </BottomSheet>
+      </View>
+    </GestureHandlerRootView>
   );
 }
 
@@ -129,6 +168,41 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 16,
+    fontWeight: "bold",
+  },
+  sheetContent: {
+    flex: 1,
+    paddingLeft: 20,
+    paddingRight: 20,
+    marginLeft: 0,
+  },
+  cancelButton: {
+    width: "100%",
+    alignItems: "flex-start",
+    marginBottom: 10,
+  },
+  sheetHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  sheetTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  input: {
+    fontSize: 18,
+    width: "100%",
+  },
+  createButton: {
+    backgroundColor: "#007AFF",
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  createButtonText: {
+    color: "white",
     fontWeight: "bold",
   },
 });

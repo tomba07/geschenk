@@ -118,8 +118,6 @@ const styles = StyleSheet.create({
     right: 20,
   },
   cancelButton: {
-    //negative margin to remove the default padding
-    margin: -10,
     width: "100%",
     alignItems: "flex-start",
     marginBottom: 10,
