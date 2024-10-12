@@ -8,6 +8,11 @@ export interface Participant {
   excludes: string[];
 }
 
+export interface BEParticipant {
+  projectId: Number;
+  name: string;
+}
+
 export interface ProjectDetails {
   id: Number;
   name: string;

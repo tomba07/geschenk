@@ -1,5 +1,5 @@
 import { apiService } from "@/utils/apiService";
-import { Participant, ProjectDetails, SimplifiedAssignment } from "@/utils/interfaces";
+import { BEParticipant, Participant, ProjectDetails, SimplifiedAssignment } from "@/utils/interfaces";
 import { findMatches } from "@/utils/SecretSantaMatcher";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -25,6 +25,19 @@ export default function DetailsScreen() {
   useEffect(() => {
     fetchProjectDetails({ projectId: projectIdAsNum });
   }, []);
+
+  const createParticipant = async () => {
+    const participant: BEParticipant = { name: "New Participant", projectId: projectIdAsNum };
+
+    try {
+      await apiService.createParticipant({  participant });
+      fetchProjectDetails({ projectId: projectIdAsNum });
+    } catch (error) {
+      console.error(error);
+    }
+
+    await fetchProjectDetails({ projectId: projectIdAsNum });
+  };
 
   const assignParticipants = async () => {
     const participants: Participant[] = projectDetails.participants.map((participant) => {
@@ -70,9 +83,14 @@ export default function DetailsScreen() {
         </Text>
       ))}
 
-      <TouchableOpacity style={styles.floatingButton} onPress={assignParticipants}>
-        <Text style={styles.buttonText}>Assign</Text>
-      </TouchableOpacity>
+      <View style={styles.footer}>
+        <TouchableOpacity style={styles.footerButton} onPress={createParticipant}>
+          <Text style={styles.buttonText}>Create</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.footerButton} onPress={assignParticipants}>
+          <Text style={styles.buttonText}>Assign</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -92,13 +110,21 @@ const styles = StyleSheet.create({
   item: {
     fontSize: 18,
   },
-  floatingButton: {
-    position: "absolute",
-    bottom: 40,
-    right: 40,
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    padding: 20,
+    backgroundColor: "#f8f8f8",
+    borderTopWidth: 1,
+    borderTopColor: "#ccc",
+  },
+  footerButton: {
     backgroundColor: "#007AFF",
     borderRadius: 10,
     padding: 10,
+    width: "40%",
+    alignItems: "center",
   },
   buttonText: {
     color: "white",

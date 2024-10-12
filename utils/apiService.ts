@@ -1,6 +1,6 @@
 // apiService.js
 
-import { Assignment } from "./interfaces";
+import { Assignment, BEParticipant } from "./interfaces";
 
 const API_BASE_URL = "https://geschenk-api-production.up.railway.app";
 
@@ -24,6 +24,16 @@ const getProjectDetails = async ({ projectId }: { projectId: Number }) => {
   return await (await fetch(`${API_BASE_URL}/projects/${projectId}`)).json();
 };
 
+const createParticipant = async ({ participant }: { participant: BEParticipant }) => {
+  return await fetch(`${API_BASE_URL}/participants`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(participant),
+  });
+};
+
 const createAssignments = async (assignments: Assignment[]) => {
   return await fetch(`${API_BASE_URL}/assignments`, {
     method: "POST",
@@ -38,5 +48,6 @@ export const apiService = {
   getProjects,
   createProject,
   getProjectDetails,
+  createParticipant,
   createAssignments,
 };
