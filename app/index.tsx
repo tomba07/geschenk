@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, TextInput, TouchableOpacity, View, Text, FlatList } from "react-native";
+import { StyleSheet, TextInput, TouchableOpacity, View, Text, FlatList, Button } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -66,21 +66,29 @@ export default function App() {
           <Ionicons name="add-circle" size={60} color="#007AFF" />
         </TouchableOpacity>
 
-        <BottomSheet ref={bottomSheetRef} index={-1} snapPoints={["25%", "50%"]}>
+        <BottomSheet ref={bottomSheetRef} index={-1} snapPoints={["10%", "30%"]}>
           <View style={styles.sheetContent}>
-            <TouchableOpacity onPress={() => bottomSheetRef.current?.close()} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color="black" />
-            </TouchableOpacity>
-            <Text style={styles.sheetTitle}>Create Project</Text>
+            <View style={styles.cancelButton}>
+              <Button
+                title="Cancel"
+                onPress={() => {
+                  bottomSheetRef.current?.close();
+                  setProjectName("");
+                }}
+              />
+            </View>
+            <View style={styles.sheetHeader}>
+              <Text style={styles.sheetTitle}>Create Project</Text>
+              <TouchableOpacity onPress={createProject} style={styles.createButton}>
+                <Text style={styles.createButtonText}>Create</Text>
+              </TouchableOpacity>
+            </View>
             <TextInput
               style={styles.input}
               placeholder="Enter project name"
               onChangeText={(text) => setProjectName(text)}
               value={projectName}
             />
-            <TouchableOpacity onPress={createProject} style={styles.createButton}>
-              <Text style={styles.createButtonText}>Create</Text>
-            </TouchableOpacity>
           </View>
         </BottomSheet>
       </View>
@@ -109,36 +117,37 @@ const styles = StyleSheet.create({
     bottom: 20,
     right: 20,
   },
-  sheetContent: {
-    flex: 1,
-    padding: 10
-  },
-  closeButton: {
-    position: "absolute",
-    top: 0,
-    right: 10,
-    zIndex: 1,
-    padding: 10,
-  },
-  sheetTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
+  cancelButton: {
+    //negative margin to remove the default padding
+    margin: -10,
+    width: "100%",
+    alignItems: "flex-start",
     marginBottom: 10,
   },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    paddingHorizontal: 10,
+  sheetHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 20,
+  },
+  sheetContent: {
+    flex: 1,
+    paddingLeft: 20,
+    paddingRight: 20,
+    marginLeft: 0,
+  },
+  sheetTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  input: {
+    fontSize: 18,
     width: "100%",
-    borderRadius: 5,
   },
   createButton: {
     backgroundColor: "#007AFF",
     padding: 10,
-    borderRadius: 5,
-    width: "100%",
+    borderRadius: 10,
     alignItems: "center",
   },
   createButtonText: {
