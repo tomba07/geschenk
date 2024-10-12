@@ -34,7 +34,12 @@ const createParticipant = async ({ participant }: { participant: BEParticipant }
   });
 };
 
-const createAssignments = async (assignments: Assignment[]) => {
+const createAssignments = async ({ assignments, projectId }: { assignments: Assignment[]; projectId: Number }) => {
+  //first delete all old assignments
+  //TODO: Think about rollback
+  await fetch(`${API_BASE_URL}/assignments/${projectId}`, {
+    method: "DELETE",
+  });
   return await fetch(`${API_BASE_URL}/assignments`, {
     method: "POST",
     headers: {

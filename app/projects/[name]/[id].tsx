@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, Button } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function DetailsScreen() {
   let { id: projectId, name: projectName } = useLocalSearchParams();
@@ -62,7 +63,7 @@ export default function DetailsScreen() {
       };
     });
     try {
-      await apiService.createAssignments(assignments);
+      await apiService.createAssignments({assignments, projectId: projectIdAsNum});
     } catch (error) {
       console.error(error);
     }
@@ -96,12 +97,10 @@ export default function DetailsScreen() {
         ))}
 
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.footerButton} onPress={() => bottomSheetRef.current?.expand()}>
-            <Text style={styles.buttonText}>Create Participant</Text>
+          <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
+            <Ionicons name="person-add-outline" size={20} color="#007bff" />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.footerButton} onPress={assignParticipants}>
-            <Text style={styles.buttonText}>Assign Participants</Text>
-          </TouchableOpacity>
+          <Button title="Assign" onPress={assignParticipants} />
         </View>
 
         <BottomSheet ref={bottomSheetRef} index={-1} snapPoints={["10%", "30%"]}>
@@ -153,7 +152,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    padding: 20,
+    paddingTop: 10,
+    paddingBottom: 40,
     backgroundColor: "#f8f8f8",
     borderTopWidth: 1,
     borderTopColor: "#ccc",
