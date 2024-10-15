@@ -21,6 +21,7 @@ export default function DetailsScreen() {
   const [assignmentsExist, setAssignmentsExist] = useState(false);
   const [participantName, setParticipantName] = useState("");
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const inputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
 
   const fetchProjectDetails = async ({ projectId }: { projectId: Number }) => {
@@ -110,7 +111,16 @@ export default function DetailsScreen() {
           <Button title="Assign" onPress={assignParticipants} />
         </View>
 
-        <BottomSheet ref={bottomSheetRef} index={-1} snapPoints={["10%", "30%"]}>
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={["10%", "30%"]}
+          onChange={(index) => {
+            if (index > 0) {
+              inputRef.current?.focus();
+            }
+          }}
+        >
           <View style={styles.sheetContent}>
             <View style={styles.cancelButton}>
               <Button
@@ -128,6 +138,7 @@ export default function DetailsScreen() {
               </TouchableOpacity>
             </View>
             <TextInput
+              ref={inputRef}
               style={styles.input}
               placeholder="Enter participant name"
               onChangeText={(text) => setParticipantName(text)}
