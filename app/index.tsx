@@ -12,6 +12,7 @@ export default function App() {
   const [projectName, setProjectName] = useState("");
   const [loading, setLoading] = useState(true);
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const inputRef = useRef<TextInput>(null);
   const router = useRouter();
 
   const fetchProjects = async () => {
@@ -66,7 +67,16 @@ export default function App() {
           <Ionicons name="add-circle" size={60} color="#007AFF" />
         </TouchableOpacity>
 
-        <BottomSheet ref={bottomSheetRef} index={-1} snapPoints={["10%", "30%"]}>
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={["10%", "30%"]}
+          onChange={(index) => {
+            if (index > 0) {
+              inputRef.current?.focus();
+            }
+          }}
+        >
           <View style={styles.sheetContent}>
             <View style={styles.cancelButton}>
               <Button
@@ -84,6 +94,7 @@ export default function App() {
               </TouchableOpacity>
             </View>
             <TextInput
+              ref={inputRef}
               style={styles.input}
               placeholder="Enter project name"
               onChangeText={(text) => setProjectName(text)}
