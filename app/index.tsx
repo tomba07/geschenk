@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StyleSheet, TextInput, TouchableOpacity, View, Text, FlatList, Button } from "react-native";
+import { TextInput, TouchableOpacity, View, Text, FlatList, Button } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -64,9 +64,9 @@ export default function App() {
           )}
         />
 
-        <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()} style={globalStyles.floatingButton}>
-          <Ionicons name="add-circle" size={60} color="#007AFF" />
-        </TouchableOpacity>
+        <View style={globalStyles.footer}>
+          <Button title="Create Project" onPress={() => bottomSheetRef.current?.expand()} />
+        </View>
 
         <BottomSheet
           ref={bottomSheetRef}
@@ -107,7 +107,3 @@ export default function App() {
     </GestureHandlerRootView>
   );
 }
-
-const styles = StyleSheet.create({
-  
-});

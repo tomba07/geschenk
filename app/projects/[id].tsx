@@ -109,24 +109,38 @@ export default function DetailsScreen() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={globalStyles.container}>
         {!assignmentsExist && (
-          <>
-            <FlatList
-              data={projectDetails.participants}
-              keyExtractor={(participant) => participant.name.toString()}
-              renderItem={({ item }) => (
-                <View style={globalStyles.itemContainer}>
-                  <Text style={globalStyles.item}>{item.name}</Text>
-                </View>
-              )}
-            />
-            <View style={globalStyles.footer}>
+          <FlatList
+            data={projectDetails.participants}
+            keyExtractor={(participant) => participant.name.toString()}
+            renderItem={({ item }) => (
+              <View style={globalStyles.itemContainer}>
+                <Text style={globalStyles.item}>{item.name}</Text>
+              </View>
+            )}
+          />
+        )}
+        <View style={globalStyles.footer}>
+          {!assignmentsExist && (
+            <>
               <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
                 <Ionicons name="person-add-outline" size={20} color="#007bff" />
               </TouchableOpacity>
               <Button title="Assign" onPress={assignParticipants} />
-            </View>
-          </>
-        )}
+            </>
+          )}
+          {assignmentsExist && (
+            <TouchableOpacity
+              onPress={async () => {
+                const fullRoute = Linking.createURL(`/projects/${projectId}`);
+
+                await Clipboard.setStringAsync(fullRoute);
+                alert("Route copied to clipboard!");
+              }}
+            >
+              <Ionicons name="share-outline" size={20} color="#007bff" />
+            </TouchableOpacity>
+          )}
+        </View>
 
         {assignmentsExist && (
           <>
@@ -136,15 +150,6 @@ export default function DetailsScreen() {
                 {assignment.fromName} - {assignment.toName}
               </Text>
             ))}
-            <Button
-              title="Copy route"
-              onPress={async () => {
-                const fullRoute = Linking.createURL(`/projects/${projectId}`);
-
-                await Clipboard.setStringAsync(fullRoute);
-                alert("Route copied to clipboard!");
-              }}
-            />
           </>
         )}
 
