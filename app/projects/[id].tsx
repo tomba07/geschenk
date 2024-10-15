@@ -1,7 +1,7 @@
 import { apiService } from "@/utils/apiService";
 import { BEParticipant, Participant, ProjectDetails, SimplifiedAssignment } from "@/utils/interfaces";
 import { findMatches } from "@/utils/SecretSantaMatcher";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, Button } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -18,11 +18,16 @@ export default function DetailsScreen() {
     participants: [],
     assignments: [],
   });
+  const [assignmentsExist, setAssignmentsExist] = useState(false);
   const [participantName, setParticipantName] = useState("");
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const navigation = useNavigation();
 
   const fetchProjectDetails = async ({ projectId }: { projectId: Number }) => {
-    setProjectDetails(await apiService.getProjectDetails({ projectId }));
+    const projectDetails = await apiService.getProjectDetails({ projectId });
+    setProjectDetails(projectDetails);
+    setAssignmentsExist(projectDetails.assignments.length > 0);
+    navigation.setOptions({ title: projectDetails.name });
     setLoading(false);
   };
 
@@ -62,7 +67,7 @@ export default function DetailsScreen() {
       };
     });
     try {
-      await apiService.createAssignments({assignments, projectId: projectIdAsNum});
+      await apiService.createAssignments({ assignments, projectId: projectIdAsNum });
     } catch (error) {
       console.error(error);
     }
@@ -79,16 +84,19 @@ export default function DetailsScreen() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
-        <FlatList
-          data={projectDetails.participants}
-          keyExtractor={(participant) => participant.name.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.itemContainer}>
-              <Text style={styles.item}>{item.name}</Text>
-            </View>
-          )}
-        />
-        {projectDetails.assignments.length > 0 && <Text>Assignments:</Text>}
+        {!assignmentsExist && (
+          <FlatList
+            data={projectDetails.participants}
+            keyExtractor={(participant) => participant.name.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.itemContainer}>
+                <Text style={styles.item}>{item.name}</Text>
+              </View>
+            )}
+          />
+        )}
+
+        {assignmentsExist && <Text>Assignments:</Text>}
         {projectDetails.assignments.map((assignment, index) => (
           <Text key={index}>
             {assignment.fromName} - {assignment.toName}
@@ -148,6 +156,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   footer: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",

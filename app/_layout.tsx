@@ -1,3 +1,4 @@
+import { apiService } from "@/utils/apiService";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
@@ -17,7 +18,7 @@ export default function RootLayout() {
       <Stack.Screen
         name="projects/[id]"
         options={({ route }: { route: { params?: any } }) => ({
-          title: decodeURIComponent(route.params?.name),
+          title: "",
         })}
       />
     </Stack>
