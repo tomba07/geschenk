@@ -69,16 +69,4 @@ export const globalStyles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#ccc",
   },
-  footerButton: {
-    backgroundColor: "#007AFF",
-    borderRadius: 10,
-    padding: 10,
-    width: "40%",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
 });

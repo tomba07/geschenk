@@ -3,14 +3,14 @@ import { BEParticipant, Participant, ProjectDetails, SimplifiedAssignment } from
 import { findMatches } from "@/utils/SecretSantaMatcher";
 import { useLocalSearchParams, useNavigation, useRouter, useSegments } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { View, Text, TouchableOpacity, FlatList, TextInput, Button } from "react-native";
+import { View, Text, TouchableOpacity, FlatList, TextInput, Button, Modal } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "@/utils/styles";
 import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
-import Toast from 'react-native-toast-message';
+import Toast from "react-native-toast-message";
 
 export default function DetailsScreen() {
   let { id: projectId } = useLocalSearchParams();
@@ -24,6 +24,7 @@ export default function DetailsScreen() {
   });
   const [assignmentsExist, setAssignmentsExist] = useState(false);
   const [participantName, setParticipantName] = useState("");
+  const [revealedAssignments, setRevealedAssignments] = useState<{ [key: string]: boolean }>({});
   const bottomSheetRef = useRef<BottomSheet>(null);
   const inputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
@@ -38,6 +39,13 @@ export default function DetailsScreen() {
 
       router.push(`/projects/${projectId}` as const);
     }
+  };
+
+  const toggleReveal = (assignmentFromName: string) => {
+    setRevealedAssignments((prevRevealed) => ({
+      ...prevRevealed,
+      [assignmentFromName]: !prevRevealed[assignmentFromName],
+    }));
   };
 
   useEffect(() => {
@@ -136,8 +144,8 @@ export default function DetailsScreen() {
 
                 await Clipboard.setStringAsync(fullRoute);
                 Toast.show({
-                    text1: 'Link copied to clipboard!',
-                  });
+                  text1: "Link copied to clipboard!",
+                });
               }}
             >
               <Ionicons name="share-outline" size={20} color="#007bff" />
@@ -145,16 +153,26 @@ export default function DetailsScreen() {
           )}
         </View>
 
-        {assignmentsExist && (
-          <>
-            <Text>Assignments:</Text>
-            {projectDetails.assignments.map((assignment, index) => (
-              <Text key={index}>
-                {assignment.fromName} - {assignment.toName}
-              </Text>
-            ))}
-          </>
-        )}
+        <FlatList
+          data={projectDetails.assignments}
+          keyExtractor={(assignment) => assignment.fromName.toString()}
+          renderItem={({ item }) => {
+            return (
+                <View style={globalStyles.itemContainer}>
+                <Text style={globalStyles.item}>{item.fromName}</Text>
+                {revealedAssignments[item.fromName] && <Text>{item.toName}</Text>}
+                <TouchableOpacity onPress={() => toggleReveal(item.fromName)}>
+                  <Ionicons
+                    name={revealedAssignments[item.fromName] ? "eye-off-outline" : "eye-outline"}
+                    size={20}
+                    color="#007bff"
+                  />
+                </TouchableOpacity>
+                
+              </View>
+            );
+          }}
+        />
 
         <BottomSheet
           ref={bottomSheetRef}
