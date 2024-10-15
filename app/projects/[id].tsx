@@ -10,6 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "@/utils/styles";
 import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
+import Toast from 'react-native-toast-message';
 
 export default function DetailsScreen() {
   let { id: projectId } = useLocalSearchParams();
@@ -134,7 +135,9 @@ export default function DetailsScreen() {
                 const fullRoute = Linking.createURL(`/projects/${projectId}`);
 
                 await Clipboard.setStringAsync(fullRoute);
-                alert("Route copied to clipboard!");
+                Toast.show({
+                    text1: 'Link copied to clipboard!',
+                  });
               }}
             >
               <Ionicons name="share-outline" size={20} color="#007bff" />
@@ -188,6 +191,7 @@ export default function DetailsScreen() {
             />
           </View>
         </BottomSheet>
+        <Toast />
       </View>
     </GestureHandlerRootView>
   );
