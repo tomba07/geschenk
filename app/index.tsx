@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useRouter } from "expo-router";
 import { apiService } from "../utils/apiService";
 import { Project } from "@/utils/interfaces";
+import { globalStyles } from "@/utils/styles";
 
 export default function App() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -51,19 +52,19 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.container}>
+      <View style={globalStyles.container}>
         <FlatList
           data={projects}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handlePress(item)} style={styles.itemContainer}>
-              <Text style={styles.item}>{item.name}</Text>
+            <TouchableOpacity onPress={() => handlePress(item)} style={globalStyles.itemContainer}>
+              <Text style={globalStyles.item}>{item.name}</Text>
               <Ionicons name="chevron-forward-outline" size={20} color="gray" />
             </TouchableOpacity>
           )}
         />
 
-        <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()} style={styles.floatingButton}>
+        <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()} style={globalStyles.floatingButton}>
           <Ionicons name="add-circle" size={60} color="#007AFF" />
         </TouchableOpacity>
 
@@ -77,8 +78,8 @@ export default function App() {
             }
           }}
         >
-          <View style={styles.sheetContent}>
-            <View style={styles.cancelButton}>
+          <View style={globalStyles.sheetContent}>
+            <View style={globalStyles.cancelButton}>
               <Button
                 title="Cancel"
                 onPress={() => {
@@ -87,15 +88,15 @@ export default function App() {
                 }}
               />
             </View>
-            <View style={styles.sheetHeader}>
-              <Text style={styles.sheetTitle}>Create Project</Text>
-              <TouchableOpacity onPress={createProject} style={styles.createButton}>
-                <Text style={styles.createButtonText}>Create</Text>
+            <View style={globalStyles.sheetHeader}>
+              <Text style={globalStyles.sheetTitle}>Create Project</Text>
+              <TouchableOpacity onPress={createProject} style={globalStyles.createButton}>
+                <Text style={globalStyles.createButtonText}>Create</Text>
               </TouchableOpacity>
             </View>
             <TextInput
               ref={inputRef}
-              style={styles.input}
+              style={globalStyles.input}
               placeholder="Enter project name"
               onChangeText={(text) => setProjectName(text)}
               value={projectName}
@@ -108,59 +109,5 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#eee",
-  },
-  itemContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  item: {
-    fontSize: 18,
-  },
-  floatingButton: {
-    position: "absolute",
-    bottom: 20,
-    right: 20,
-  },
-  cancelButton: {
-    width: "100%",
-    alignItems: "flex-start",
-    marginBottom: 10,
-  },
-  sheetHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  sheetContent: {
-    flex: 1,
-    paddingLeft: 20,
-    paddingRight: 20,
-    marginLeft: 0,
-  },
-  sheetTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  input: {
-    fontSize: 18,
-    width: "100%",
-  },
-  createButton: {
-    backgroundColor: "#007AFF",
-    padding: 10,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  createButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
+  
 });

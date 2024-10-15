@@ -7,6 +7,7 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, Button }
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
+import { globalStyles } from "@/utils/styles";
 
 export default function DetailsScreen() {
   let { id: projectId } = useLocalSearchParams();
@@ -84,14 +85,14 @@ export default function DetailsScreen() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <View style={styles.container}>
+      <View style={globalStyles.container}>
         {!assignmentsExist && (
           <FlatList
             data={projectDetails.participants}
             keyExtractor={(participant) => participant.name.toString()}
             renderItem={({ item }) => (
-              <View style={styles.itemContainer}>
-                <Text style={styles.item}>{item.name}</Text>
+              <View style={globalStyles.itemContainer}>
+                <Text style={globalStyles.item}>{item.name}</Text>
               </View>
             )}
           />
@@ -104,7 +105,7 @@ export default function DetailsScreen() {
           </Text>
         ))}
 
-        <View style={styles.footer}>
+        <View style={globalStyles.footer}>
           <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
             <Ionicons name="person-add-outline" size={20} color="#007bff" />
           </TouchableOpacity>
@@ -121,8 +122,8 @@ export default function DetailsScreen() {
             }
           }}
         >
-          <View style={styles.sheetContent}>
-            <View style={styles.cancelButton}>
+          <View style={globalStyles.sheetContent}>
+            <View style={globalStyles.cancelButton}>
               <Button
                 title="Cancel"
                 onPress={() => {
@@ -131,15 +132,15 @@ export default function DetailsScreen() {
                 }}
               />
             </View>
-            <View style={styles.sheetHeader}>
-              <Text style={styles.sheetTitle}>Create Participant</Text>
-              <TouchableOpacity onPress={createParticipant} style={styles.createButton}>
-                <Text style={styles.createButtonText}>Create</Text>
+            <View style={globalStyles.sheetHeader}>
+              <Text style={globalStyles.sheetTitle}>Create Participant</Text>
+              <TouchableOpacity onPress={createParticipant} style={globalStyles.createButton}>
+                <Text style={globalStyles.createButtonText}>Create</Text>
               </TouchableOpacity>
             </View>
             <TextInput
               ref={inputRef}
-              style={styles.input}
+              style={globalStyles.input}
               placeholder="Enter participant name"
               onChangeText={(text) => setParticipantName(text)}
               value={participantName}
@@ -150,80 +151,3 @@ export default function DetailsScreen() {
     </GestureHandlerRootView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  itemContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-  },
-  item: {
-    fontSize: 18,
-  },
-  footer: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    paddingTop: 10,
-    paddingBottom: 40,
-    backgroundColor: "#f8f8f8",
-    borderTopWidth: 1,
-    borderTopColor: "#ccc",
-  },
-  footerButton: {
-    backgroundColor: "#007AFF",
-    borderRadius: 10,
-    padding: 10,
-    width: "40%",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  sheetContent: {
-    flex: 1,
-    paddingLeft: 20,
-    paddingRight: 20,
-    marginLeft: 0,
-  },
-  cancelButton: {
-    width: "100%",
-    alignItems: "flex-start",
-    marginBottom: 10,
-  },
-  sheetHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  sheetTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  input: {
-    fontSize: 18,
-    width: "100%",
-  },
-  createButton: {
-    backgroundColor: "#007AFF",
-    padding: 10,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  createButtonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-});
