@@ -1,7 +1,7 @@
 import { apiService } from "@/utils/apiService";
 import { BEParticipant, Participant, ProjectDetails, SimplifiedAssignment } from "@/utils/interfaces";
 import { findMatches } from "@/utils/SecretSantaMatcher";
-import { useLocalSearchParams, useNavigation, useSegments } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter, useSegments } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { View, Text, TouchableOpacity, FlatList, TextInput, Button } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -26,6 +26,26 @@ export default function DetailsScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const inputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
+  const router = useRouter();
+
+  const handleDeepLink = (event: any) => {
+    const data = Linking.parse(event.url);
+    const { path } = data;
+
+    if (path?.startsWith("projects/")) {
+      const projectId = path.split("/")[1];
+
+      router.push(`/projects/${projectId}` as const);
+    }
+  };
+
+  useEffect(() => {
+    const subscription = Linking.addEventListener("url", handleDeepLink);
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   const fetchProjectDetails = async ({ projectId }: { projectId: Number }) => {
     const projectDetails = await apiService.getProjectDetails({ projectId });
@@ -119,8 +139,7 @@ export default function DetailsScreen() {
             <Button
               title="Copy route"
               onPress={async () => {
-                const scheme = Linking.createURL("");
-                const fullRoute = `${scheme}projects/${projectId}`;
+                const fullRoute = Linking.createURL(`/projects/${projectId}`);
 
                 await Clipboard.setStringAsync(fullRoute);
                 alert("Route copied to clipboard!");
