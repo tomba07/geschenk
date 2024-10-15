@@ -37,7 +37,7 @@ export default function App() {
   }, []);
 
   const handlePress = (item: Project) => {
-    router.push(`/projects/${item.name}/${item.id.toString()}` as const);
+    router.push(`/projects/${item.id.toString()}` as const);
   };
 
   if (loading) {

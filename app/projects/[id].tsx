@@ -9,13 +9,12 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function DetailsScreen() {
-  let { id: projectId, name: projectName } = useLocalSearchParams();
+  let { id: projectId } = useLocalSearchParams();
   const projectIdAsNum = Number(projectId);
-  projectName = projectName.toString();
   const [loading, setLoading] = useState(true);
   const [projectDetails, setProjectDetails] = useState<ProjectDetails>({
     id: projectIdAsNum,
-    name: projectName,
+    name: "",
     participants: [],
     assignments: [],
   });

@@ -15,7 +15,7 @@ export default function RootLayout() {
     >
       <Stack.Screen name="index" options={{ title: "Projects" }} />
       <Stack.Screen
-        name="projects/[name]/[id]"
+        name="projects/[id]"
         options={({ route }: { route: { params?: any } }) => ({
           title: decodeURIComponent(route.params?.name),
         })}
