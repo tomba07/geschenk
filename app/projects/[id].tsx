@@ -1,13 +1,15 @@
 import { apiService } from "@/utils/apiService";
 import { BEParticipant, Participant, ProjectDetails, SimplifiedAssignment } from "@/utils/interfaces";
 import { findMatches } from "@/utils/SecretSantaMatcher";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, useSegments } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, TextInput, Button } from "react-native";
+import { View, Text, TouchableOpacity, FlatList, TextInput, Button } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "@/utils/styles";
+import * as Clipboard from "expo-clipboard";
+import * as Linking from "expo-linking";
 
 export default function DetailsScreen() {
   let { id: projectId } = useLocalSearchParams();
@@ -87,30 +89,45 @@ export default function DetailsScreen() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={globalStyles.container}>
         {!assignmentsExist && (
-          <FlatList
-            data={projectDetails.participants}
-            keyExtractor={(participant) => participant.name.toString()}
-            renderItem={({ item }) => (
-              <View style={globalStyles.itemContainer}>
-                <Text style={globalStyles.item}>{item.name}</Text>
-              </View>
-            )}
-          />
+          <>
+            <FlatList
+              data={projectDetails.participants}
+              keyExtractor={(participant) => participant.name.toString()}
+              renderItem={({ item }) => (
+                <View style={globalStyles.itemContainer}>
+                  <Text style={globalStyles.item}>{item.name}</Text>
+                </View>
+              )}
+            />
+            <View style={globalStyles.footer}>
+              <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
+                <Ionicons name="person-add-outline" size={20} color="#007bff" />
+              </TouchableOpacity>
+              <Button title="Assign" onPress={assignParticipants} />
+            </View>
+          </>
         )}
 
-        {assignmentsExist && <Text>Assignments:</Text>}
-        {projectDetails.assignments.map((assignment, index) => (
-          <Text key={index}>
-            {assignment.fromName} - {assignment.toName}
-          </Text>
-        ))}
+        {assignmentsExist && (
+          <>
+            <Text>Assignments:</Text>
+            {projectDetails.assignments.map((assignment, index) => (
+              <Text key={index}>
+                {assignment.fromName} - {assignment.toName}
+              </Text>
+            ))}
+            <Button
+              title="Copy route"
+              onPress={async () => {
+                const scheme = Linking.createURL("");
+                const fullRoute = `${scheme}projects/${projectId}`;
 
-        <View style={globalStyles.footer}>
-          <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
-            <Ionicons name="person-add-outline" size={20} color="#007bff" />
-          </TouchableOpacity>
-          <Button title="Assign" onPress={assignParticipants} />
-        </View>
+                await Clipboard.setStringAsync(fullRoute);
+                alert("Route copied to clipboard!");
+              }}
+            />
+          </>
+        )}
 
         <BottomSheet
           ref={bottomSheetRef}
