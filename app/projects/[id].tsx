@@ -133,7 +133,7 @@ export default function DetailsScreen() {
           keyExtractor={(assignment) => assignment.fromName.toString()}
           renderItem={({ item }) => {
             return (
-                <View style={globalStyles.itemContainer}>
+              <View style={globalStyles.itemContainer}>
                 <Text style={globalStyles.item}>{item.fromName}</Text>
                 {revealedAssignments[item.fromName] && <Text>{item.toName}</Text>}
                 <TouchableOpacity onPress={() => toggleReveal(item.fromName)}>
@@ -150,10 +150,10 @@ export default function DetailsScreen() {
         <View style={globalStyles.footer}>
           {!assignmentsExist && (
             <>
+              <Button title="Assign" onPress={assignParticipants} />
               <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
                 <Ionicons name="person-add-outline" size={20} color="#007bff" />
               </TouchableOpacity>
-              <Button title="Assign" onPress={assignParticipants} />
             </>
           )}
           {assignmentsExist && (
