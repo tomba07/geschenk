@@ -1,6 +1,5 @@
 import { Stack } from "expo-router";
-import { TouchableOpacity, Text } from 'react-native';
-import { EditModeProvider, useEditMode } from '@/utils/context/EditModeContext';
+import { EditModeProvider } from '@/utils/context/EditModeContext';
 import { useState } from 'react';
 import { HeaderRight } from '@/components/HeaderRight';
 
