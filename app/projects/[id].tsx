@@ -1,9 +1,9 @@
 import { apiService } from "@/utils/apiService";
 import { BEParticipant, Participant, ProjectDetails, SimplifiedAssignment } from "@/utils/interfaces";
 import { findMatches } from "@/utils/SecretSantaMatcher";
-import { useLocalSearchParams, useNavigation, useRouter, useSegments } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { View, Text, TouchableOpacity, FlatList, TextInput, Button, Modal } from "react-native";
+import { View, Text, TouchableOpacity, FlatList, TextInput, Button } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
@@ -128,6 +128,25 @@ export default function DetailsScreen() {
             )}
           />
         )}
+        <FlatList
+          data={projectDetails.assignments}
+          keyExtractor={(assignment) => assignment.fromName.toString()}
+          renderItem={({ item }) => {
+            return (
+                <View style={globalStyles.itemContainer}>
+                <Text style={globalStyles.item}>{item.fromName}</Text>
+                {revealedAssignments[item.fromName] && <Text>{item.toName}</Text>}
+                <TouchableOpacity onPress={() => toggleReveal(item.fromName)}>
+                  <Ionicons
+                    name={revealedAssignments[item.fromName] ? "eye-off-outline" : "eye-outline"}
+                    size={20}
+                    color="#007bff"
+                  />
+                </TouchableOpacity>
+              </View>
+            );
+          }}
+        />
         <View style={globalStyles.footer}>
           {!assignmentsExist && (
             <>
@@ -152,27 +171,6 @@ export default function DetailsScreen() {
             </TouchableOpacity>
           )}
         </View>
-
-        <FlatList
-          data={projectDetails.assignments}
-          keyExtractor={(assignment) => assignment.fromName.toString()}
-          renderItem={({ item }) => {
-            return (
-                <View style={globalStyles.itemContainer}>
-                <Text style={globalStyles.item}>{item.fromName}</Text>
-                {revealedAssignments[item.fromName] && <Text>{item.toName}</Text>}
-                <TouchableOpacity onPress={() => toggleReveal(item.fromName)}>
-                  <Ionicons
-                    name={revealedAssignments[item.fromName] ? "eye-off-outline" : "eye-outline"}
-                    size={20}
-                    color="#007bff"
-                  />
-                </TouchableOpacity>
-                
-              </View>
-            );
-          }}
-        />
 
         <BottomSheet
           ref={bottomSheetRef}
