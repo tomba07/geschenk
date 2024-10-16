@@ -40,6 +40,12 @@ const createParticipant = async ({ participant }: { participant: BEParticipant }
   });
 };
 
+const deleteParticipant = async ({ name, projectId }: { name: String, projectId: Number }) => {
+  return await fetch(`${API_BASE_URL}/projects/${projectId}/participants/${name}`, {
+    method: "DELETE",
+  });
+};
+
 const createAssignments = async ({ assignments, projectId }: { assignments: Assignment[]; projectId: Number }) => {
   //first delete all old assignments
   //TODO: Think about rollback
@@ -62,4 +68,5 @@ export const apiService = {
   createParticipant,
   createAssignments,
   deleteProject,
+  deleteParticipant,
 };

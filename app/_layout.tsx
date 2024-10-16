@@ -24,13 +24,13 @@ function RootLayoutNav() {
         headerTitleStyle: {
           fontWeight: "bold",
         },
+        headerRight: () => <HeaderRight />,
       }}
     >
       <Stack.Screen
         name="index"
         options={{
           title: "Projects",
-          headerRight: () => <HeaderRight />,
         }}
       />
       <Stack.Screen

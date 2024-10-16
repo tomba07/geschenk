@@ -12,6 +12,7 @@ import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
 import Toast from "react-native-toast-message";
 import { CustomBottomSheet } from "@/components/BottomSheet";
+import { useEditMode } from '@/utils/context/EditModeContext';
 
 export default function DetailsScreen() {
   let { id: projectId } = useLocalSearchParams();
@@ -29,6 +30,8 @@ export default function DetailsScreen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const navigation = useNavigation();
   const router = useRouter();
+  const { isEditMode, setIsEditMode } = useEditMode();
+  const [selectedParticipants, setSelectedParticipants] = useState<Set<String>>(new Set());
 
   const handleDeepLink = (event: any) => {
     const data = Linking.parse(event.url);
@@ -106,6 +109,34 @@ export default function DetailsScreen() {
     }
   };
 
+  useEffect(() => {
+    // Reset edit mode when component mounts
+    setIsEditMode(false);
+
+    // Optionally, reset edit mode when component unmounts
+    return () => setIsEditMode(false);
+  }, []);
+
+  const toggleParticipantSelection = (name: String) => {
+    setSelectedParticipants((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(name)) {
+        newSet.delete(name);
+      } else {
+        newSet.add(name);
+      }
+      return newSet;
+    });
+  };
+
+  const deleteSelectedParticipants = async () => {
+    for (const name of selectedParticipants) {
+      await apiService.deleteParticipant({ name, projectId: projectIdAsNum });
+    }
+    fetchProjectDetails({ projectId: projectIdAsNum });
+    setSelectedParticipants(new Set());
+  };
+
   if (loading) {
     return (
       <View>
@@ -120,11 +151,22 @@ export default function DetailsScreen() {
         {!assignmentsExist && (
           <FlatList
             data={projectDetails.participants}
-            keyExtractor={(participant) => participant.name.toString()}
+            keyExtractor={(participant) => participant.name}
             renderItem={({ item }) => (
-              <View style={globalStyles.itemContainer}>
+              <TouchableOpacity 
+                onPress={() => isEditMode ? toggleParticipantSelection(item.name) : null}
+                style={[globalStyles.itemContainer, { flexDirection: 'row', alignItems: 'center' }]}
+              >
                 <Text style={globalStyles.item}>{item.name}</Text>
-              </View>
+                {isEditMode && (
+                  <Ionicons
+                    name={selectedParticipants.has(item.name) ? "checkbox" : "square-outline"}
+                    size={24}
+                    color="gray"
+                    style={{ marginRight: 10 }}
+                  />
+                )}
+              </TouchableOpacity>
             )}
           />
         )}
@@ -150,10 +192,20 @@ export default function DetailsScreen() {
         <View style={globalStyles.footer}>
           {!assignmentsExist && (
             <>
-              <Button title="Assign" onPress={assignParticipants} />
-              <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
-                <Ionicons name="person-add-outline" size={20} color="#007bff" />
-              </TouchableOpacity>
+              {isEditMode ? (
+                <Button
+                  title={`Delete Selected (${selectedParticipants.size})`}
+                  onPress={deleteSelectedParticipants}
+                  disabled={selectedParticipants.size === 0}
+                />
+              ) : (
+                <>
+                  <Button title="Assign" onPress={assignParticipants} />
+                  <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
+                    <Ionicons name="person-add-outline" size={20} color="#007bff" />
+                  </TouchableOpacity>
+                </>
+              )}
             </>
           )}
           {assignmentsExist && (
