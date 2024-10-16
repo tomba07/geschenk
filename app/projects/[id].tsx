@@ -11,6 +11,7 @@ import { globalStyles } from "@/utils/styles";
 import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
 import Toast from "react-native-toast-message";
+import { CustomBottomSheet } from "@/components/BottomSheet";
 
 export default function DetailsScreen() {
   let { id: projectId } = useLocalSearchParams();
@@ -26,7 +27,6 @@ export default function DetailsScreen() {
   const [participantName, setParticipantName] = useState("");
   const [revealedAssignments, setRevealedAssignments] = useState<{ [key: string]: boolean }>({});
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const inputRef = useRef<TextInput>(null);
   const navigation = useNavigation();
   const router = useRouter();
 
@@ -172,41 +172,19 @@ export default function DetailsScreen() {
           )}
         </View>
 
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={-1}
-          snapPoints={["10%", "30%"]}
-          onChange={(index) => {
-            if (index > 0) {
-              inputRef.current?.focus();
-            }
+        <CustomBottomSheet
+          bottomSheetRef={bottomSheetRef}
+          title="Create Participant"
+          inputPlaceholder="Enter participant name"
+          inputValue={participantName}
+          onInputChange={setParticipantName}
+          onCancel={() => {
+            bottomSheetRef.current?.close();
+            setParticipantName("");
           }}
-        >
-          <View style={globalStyles.sheetContent}>
-            <View style={globalStyles.cancelButton}>
-              <Button
-                title="Cancel"
-                onPress={() => {
-                  bottomSheetRef.current?.close();
-                  setParticipantName("");
-                }}
-              />
-            </View>
-            <View style={globalStyles.sheetHeader}>
-              <Text style={globalStyles.sheetTitle}>Create Participant</Text>
-              <TouchableOpacity onPress={createParticipant} style={globalStyles.createButton}>
-                <Text style={globalStyles.createButtonText}>Create</Text>
-              </TouchableOpacity>
-            </View>
-            <TextInput
-              ref={inputRef}
-              style={globalStyles.input}
-              placeholder="Enter participant name"
-              onChangeText={(text) => setParticipantName(text)}
-              value={participantName}
-            />
-          </View>
-        </BottomSheet>
+          onSubmit={createParticipant}
+          submitButtonText="Create"
+        />
         <Toast />
       </View>
     </GestureHandlerRootView>

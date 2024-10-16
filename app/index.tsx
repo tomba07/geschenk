@@ -7,13 +7,14 @@ import { useRouter } from "expo-router";
 import { apiService } from "../utils/apiService";
 import { Project } from "@/utils/interfaces";
 import { globalStyles } from "@/utils/styles";
+import { CustomBottomSheet } from "@/components/BottomSheet";
+
 
 export default function App() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectName, setProjectName] = useState("");
   const [loading, setLoading] = useState(true);
   const bottomSheetRef = useRef<BottomSheet>(null);
-  const inputRef = useRef<TextInput>(null);
   const router = useRouter();
 
   const fetchProjects = async () => {
@@ -68,41 +69,19 @@ export default function App() {
           <Button title="Create Project" onPress={() => bottomSheetRef.current?.expand()} />
         </View>
 
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={-1}
-          snapPoints={["10%", "30%"]}
-          onChange={(index) => {
-            if (index > 0) {
-              inputRef.current?.focus();
-            }
+        <CustomBottomSheet
+          bottomSheetRef={bottomSheetRef}
+          title="Create Project"
+          inputPlaceholder="Enter project name"
+          inputValue={projectName}
+          onInputChange={setProjectName}
+          onCancel={() => {
+            bottomSheetRef.current?.close();
+            setProjectName("");
           }}
-        >
-          <View style={globalStyles.sheetContent}>
-            <View style={globalStyles.cancelButton}>
-              <Button
-                title="Cancel"
-                onPress={() => {
-                  bottomSheetRef.current?.close();
-                  setProjectName("");
-                }}
-              />
-            </View>
-            <View style={globalStyles.sheetHeader}>
-              <Text style={globalStyles.sheetTitle}>Create Project</Text>
-              <TouchableOpacity onPress={createProject} style={globalStyles.createButton}>
-                <Text style={globalStyles.createButtonText}>Create</Text>
-              </TouchableOpacity>
-            </View>
-            <TextInput
-              ref={inputRef}
-              style={globalStyles.input}
-              placeholder="Enter project name"
-              onChangeText={(text) => setProjectName(text)}
-              value={projectName}
-            />
-          </View>
-        </BottomSheet>
+          onSubmit={createProject}
+          submitButtonText="Create"
+        />
       </View>
     </GestureHandlerRootView>
   );
