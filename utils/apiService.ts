@@ -57,7 +57,7 @@ const createAssignments = async ({ assignments, projectId }: { assignments: Assi
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(assignments),
+    body: JSON.stringify({ projectId, assignments }),
   });
 };
 
