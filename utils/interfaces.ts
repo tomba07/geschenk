@@ -1,5 +1,5 @@
 export interface Project {
-  id: Number;
+  id: number;
   name: string;
 }
 

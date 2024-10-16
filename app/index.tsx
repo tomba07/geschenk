@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { TextInput, TouchableOpacity, View, Text, FlatList, Button } from "react-native";
+import { TouchableOpacity, View, Text, FlatList, Button } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -8,7 +8,7 @@ import { apiService } from "../utils/apiService";
 import { Project } from "@/utils/interfaces";
 import { globalStyles } from "@/utils/styles";
 import { CustomBottomSheet } from "@/components/BottomSheet";
-
+import { useEditMode } from '@/utils/context/EditModeContext';
 
 export default function App() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -16,6 +16,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const router = useRouter();
+  const { isEditMode } = useEditMode();
+  const [selectedProjects, setSelectedProjects] = useState<Set<number>>(new Set());
 
   const fetchProjects = async () => {
     const beProjects = await apiService.getProjects();
@@ -43,6 +45,27 @@ export default function App() {
     router.push(`/projects/${item.id.toString()}` as const);
   };
 
+  const toggleProjectSelection = (projectId: number) => {
+    setSelectedProjects((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(projectId)) {
+        newSet.delete(projectId);
+      } else {
+        newSet.add(projectId);
+      }
+      return newSet;
+    });
+  };
+
+  const deleteSelectedProjects = async () => {
+    for (const projectId of selectedProjects) {
+      await apiService.deleteProject({ projectId });
+      fetchProjects();
+    }
+    fetchProjects();
+    setSelectedProjects(new Set());
+  };
+
   if (loading) {
     return (
       <View>
@@ -58,15 +81,34 @@ export default function App() {
           data={projects}
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handlePress(item)} style={globalStyles.itemContainer}>
+            <TouchableOpacity
+              onPress={() => isEditMode ? toggleProjectSelection(item.id) : handlePress(item)}
+              style={[globalStyles.itemContainer, { flexDirection: 'row', alignItems: 'center' }]}
+            >
               <Text style={globalStyles.item}>{item.name}</Text>
-              <Ionicons name="chevron-forward-outline" size={20} color="gray" />
+              {isEditMode && (
+                <Ionicons
+                  name={selectedProjects.has(item.id) ? "checkbox" : "square-outline"}
+                  size={24}
+                  color="gray"
+                  style={{ marginRight: 10 }}
+                />
+              )}
+              {!isEditMode && <Ionicons name="chevron-forward-outline" size={20} color="gray" />}
             </TouchableOpacity>
           )}
         />
 
         <View style={globalStyles.footer}>
-          <Button title="Create Project" onPress={() => bottomSheetRef.current?.expand()} />
+          {isEditMode ? (
+            <Button
+              title={`Delete Selected (${selectedProjects.size})`}
+              onPress={deleteSelectedProjects}
+              disabled={selectedProjects.size === 0}
+            />
+          ) : (
+            <Button title="Create Project" onPress={() => bottomSheetRef.current?.expand()} />
+          )}
         </View>
 
         <CustomBottomSheet

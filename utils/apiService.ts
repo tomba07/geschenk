@@ -20,6 +20,12 @@ const createProject = async ({ projectName }: { projectName: String }): Promise<
   });
 };
 
+const deleteProject = async ({ projectId }: { projectId: Number }) => {
+  return await fetch(`${API_BASE_URL}/projects/${projectId}`, {
+    method: "DELETE",
+  });
+};
+
 const getProjectDetails = async ({ projectId }: { projectId: Number }) => {
   return await (await fetch(`${API_BASE_URL}/projects/${projectId}`)).json();
 };
@@ -55,4 +61,5 @@ export const apiService = {
   getProjectDetails,
   createParticipant,
   createAssignments,
+  deleteProject,
 };

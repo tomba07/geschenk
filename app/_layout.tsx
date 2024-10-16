@@ -1,7 +1,19 @@
-import { apiService } from "@/utils/apiService";
 import { Stack } from "expo-router";
+import { TouchableOpacity, Text } from 'react-native';
+import { EditModeProvider, useEditMode } from '@/utils/context/EditModeContext';
 
-export default function RootLayout() {
+function HeaderRight() {
+  const { isEditMode, setIsEditMode } = useEditMode();
+  return (
+    <TouchableOpacity onPress={() => setIsEditMode(!isEditMode)}>
+      <Text style={{ color: '#fff', marginRight: 15 }}>
+        {isEditMode ? "Done" : "Edit"}
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
+function RootLayoutNav() {
   return (
     <Stack
       screenOptions={{
@@ -14,7 +26,13 @@ export default function RootLayout() {
         },
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Projects" }} />
+      <Stack.Screen
+        name="index"
+        options={{
+          title: "Projects",
+          headerRight: () => <HeaderRight />,
+        }}
+      />
       <Stack.Screen
         name="projects/[id]"
         options={({ route }: { route: { params?: any } }) => ({
@@ -22,5 +40,13 @@ export default function RootLayout() {
         })}
       />
     </Stack>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <EditModeProvider>
+      <RootLayoutNav />
+    </EditModeProvider>
   );
 }
