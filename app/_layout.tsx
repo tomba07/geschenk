@@ -1,19 +1,12 @@
 import { Stack } from "expo-router";
 import { TouchableOpacity, Text } from 'react-native';
 import { EditModeProvider, useEditMode } from '@/utils/context/EditModeContext';
-
-function HeaderRight() {
-  const { isEditMode, setIsEditMode } = useEditMode();
-  return (
-    <TouchableOpacity onPress={() => setIsEditMode(!isEditMode)}>
-      <Text style={{ color: '#fff', marginRight: 15 }}>
-        {isEditMode ? "Done" : "Edit"}
-      </Text>
-    </TouchableOpacity>
-  );
-}
+import { useState } from 'react';
+import { HeaderRight } from '@/components/HeaderRight';
 
 function RootLayoutNav() {
+  const [assignmentsExist, setAssignmentsExist] = useState(false);
+
   return (
     <Stack
       screenOptions={{
@@ -24,7 +17,7 @@ function RootLayoutNav() {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        headerRight: () => <HeaderRight />,
+        headerRight: () => <HeaderRight assignmentsExist={assignmentsExist} />,
       }}
     >
       <Stack.Screen

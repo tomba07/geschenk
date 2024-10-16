@@ -13,6 +13,7 @@ import * as Linking from "expo-linking";
 import Toast from "react-native-toast-message";
 import { CustomBottomSheet } from "@/components/BottomSheet";
 import { useEditMode } from '@/utils/context/EditModeContext';
+import { HeaderRight } from '@/components/HeaderRight';
 
 export default function DetailsScreen() {
   let { id: projectId } = useLocalSearchParams();
@@ -59,17 +60,21 @@ export default function DetailsScreen() {
     };
   }, []);
 
-  const fetchProjectDetails = async ({ projectId }: { projectId: Number }) => {
-    const projectDetails = await apiService.getProjectDetails({ projectId });
+  const fetchProjectDetails = async () => {
+    const projectDetails = await apiService.getProjectDetails({ projectId: projectIdAsNum });
     setProjectDetails(projectDetails);
-    setAssignmentsExist(projectDetails.assignments.length > 0);
-    navigation.setOptions({ title: projectDetails.name });
+    const assignmentsExist = projectDetails.assignments.length > 0;
+    setAssignmentsExist(assignmentsExist);
+    navigation.setOptions({ 
+      title: projectDetails.name,
+      headerRight: () => <HeaderRight assignmentsExist={assignmentsExist} />
+    });
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchProjectDetails({ projectId: projectIdAsNum });
-  }, []);
+    fetchProjectDetails();
+  }, [projectIdAsNum, navigation]);
 
   const createParticipant = async () => {
     const participant: BEParticipant = { name: participantName, projectId: projectIdAsNum };
@@ -78,7 +83,7 @@ export default function DetailsScreen() {
       await apiService.createParticipant({ participant });
       setParticipantName("");
       bottomSheetRef.current?.close();
-      fetchProjectDetails({ projectId: projectIdAsNum });
+      fetchProjectDetails();
     } catch (error) {
       console.error(error);
     }
@@ -92,7 +97,7 @@ export default function DetailsScreen() {
     const assignments: SimplifiedAssignment[] = findMatches(participants);
     await createAssignments(assignments);
 
-    fetchProjectDetails({ projectId: projectIdAsNum });
+    fetchProjectDetails();
   };
 
   const createAssignments = async (simplifiedAssignments: SimplifiedAssignment[]) => {
@@ -133,7 +138,7 @@ export default function DetailsScreen() {
     for (const name of selectedParticipants) {
       await apiService.deleteParticipant({ name, projectId: projectIdAsNum });
     }
-    fetchProjectDetails({ projectId: projectIdAsNum });
+    fetchProjectDetails();
     setSelectedParticipants(new Set());
   };
 
