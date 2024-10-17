@@ -2,7 +2,7 @@ import { apiService } from "@/utils/apiService";
 import { BEParticipant, ProjectDetails, Participant, SimplifiedAssignment } from "@/utils/interfaces";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { View, Text, FlatList, TextInput, Button, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, TextInput, Button, TouchableOpacity, ActivityIndicator } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
@@ -99,17 +99,14 @@ export default function ParticipantsScreen() {
     setSelectedParticipants(new Set());
   };
 
-  if (loading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={globalStyles.container}>
+        {loading && (
+          <View style={globalStyles.loading}>
+            <ActivityIndicator size="large" />
+          </View>
+        )}
         <FlatList
           data={projectDetails.participants}
           keyExtractor={(participant) => participant.name.toString()}

@@ -2,7 +2,7 @@ import { apiService } from "@/utils/apiService";
 import { ProjectDetails } from "@/utils/interfaces";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "@/utils/styles";
@@ -42,17 +42,14 @@ export default function ResultsScreen() {
     }));
   };
 
-  if (loading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={globalStyles.container}>
+        {loading && (
+          <View style={globalStyles.loading}>
+            <ActivityIndicator size="large" />
+          </View>
+        )}
         <FlatList
           data={projectDetails.assignments}
           keyExtractor={(assignment) => assignment.fromName.toString()}

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { TouchableOpacity, View, Text, FlatList, Button } from "react-native";
+import { TouchableOpacity, View, Text, FlatList, Button, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -42,7 +42,7 @@ export default function App() {
   useFocusEffect(
     useCallback(() => {
       fetchProjects();
-    }, [])
+    }, []),
   );
 
   const handlePress = (item: Project) => {
@@ -73,17 +73,14 @@ export default function App() {
     setSelectedProjects(new Set());
   };
 
-  if (loading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={globalStyles.container}>
+        {loading && (
+          <View style={globalStyles.loading}>
+            <ActivityIndicator size="large" />
+          </View>
+        )}
         <FlatList
           data={projects}
           keyExtractor={(item) => item.id.toString()}
