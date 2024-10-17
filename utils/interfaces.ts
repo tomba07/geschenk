@@ -1,6 +1,7 @@
 export interface Project {
   id: number;
   name: string;
+  assigned: boolean;
 }
 
 export interface Participant {

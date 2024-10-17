@@ -8,7 +8,7 @@ import { apiService } from "../utils/apiService";
 import { Project } from "@/utils/interfaces";
 import { globalStyles } from "@/utils/styles";
 import { CustomBottomSheet } from "@/components/BottomSheet";
-import { useEditMode } from '@/utils/context/EditModeContext';
+import { useEditMode } from "@/utils/context/EditModeContext";
 
 export default function App() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -42,7 +42,11 @@ export default function App() {
   }, []);
 
   const handlePress = (item: Project) => {
-    router.push(`/projects/${item.id.toString()}` as const);
+    if (item.assigned) {
+      router.push(`/results/${item.id.toString()}` as const);
+    } else {
+      router.push(`/projects/${item.id.toString()}` as const);
+    }
   };
 
   const toggleProjectSelection = (projectId: number) => {
@@ -82,8 +86,8 @@ export default function App() {
           keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <TouchableOpacity
-              onPress={() => isEditMode ? toggleProjectSelection(item.id) : handlePress(item)}
-              style={[globalStyles.itemContainer, { flexDirection: 'row', alignItems: 'center' }]}
+              onPress={() => (isEditMode ? toggleProjectSelection(item.id) : handlePress(item))}
+              style={[globalStyles.itemContainer, { flexDirection: "row", alignItems: "center" }]}
             >
               <Text style={globalStyles.item}>{item.name}</Text>
               {isEditMode && (

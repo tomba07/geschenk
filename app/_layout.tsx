@@ -31,6 +31,12 @@ function RootLayoutNav() {
           title: "",
         })}
       />
+      <Stack.Screen
+        name="results/[id]"
+        options={({ route }: { route: { params?: any } }) => ({
+          title: "",
+        })}
+      />
     </Stack>
   );
 }
