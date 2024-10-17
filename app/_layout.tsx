@@ -1,14 +1,11 @@
 import { Stack } from "expo-router";
-import { EditModeProvider } from '@/utils/context/EditModeContext';
-import { useState } from 'react';
-import { HeaderRight } from '@/components/HeaderRight';
+import { EditModeProvider } from "@/utils/context/EditModeContext";
+import { HeaderRight } from "@/components/HeaderRight";
 
 function RootLayoutNav() {
-  const [assignmentsExist, setAssignmentsExist] = useState(false);
-
   return (
     <Stack
-      screenOptions={{
+      screenOptions={({ route }) => ({
         headerStyle: {
           backgroundColor: "grey",
         },
@@ -16,8 +13,8 @@ function RootLayoutNav() {
         headerTitleStyle: {
           fontWeight: "bold",
         },
-        headerRight: () => <HeaderRight assignmentsExist={assignmentsExist} />,
-      }}
+        headerRight: () => (route.name !== "results/[id]" ? <HeaderRight /> : null),
+      })}
     >
       <Stack.Screen
         name="index"
@@ -27,15 +24,15 @@ function RootLayoutNav() {
       />
       <Stack.Screen
         name="projects/[id]"
-        options={({ route }: { route: { params?: any } }) => ({
+        options={{
           title: "",
-        })}
+        }}
       />
       <Stack.Screen
         name="results/[id]"
-        options={({ route }: { route: { params?: any } }) => ({
+        options={{
           title: "",
-        })}
+        }}
       />
     </Stack>
   );

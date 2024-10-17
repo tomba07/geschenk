@@ -2,12 +2,8 @@ import React from 'react';
 import { TouchableOpacity, Text } from 'react-native';
 import { useEditMode } from '@/utils/context/EditModeContext';
 
-export function HeaderRight({ assignmentsExist }: { assignmentsExist: boolean }) {
+export function HeaderRight() {
   const { isEditMode, setIsEditMode } = useEditMode();
-  
-  if (assignmentsExist) {
-    return null;
-  }
 
   return (
     <TouchableOpacity onPress={() => setIsEditMode(!isEditMode)}>

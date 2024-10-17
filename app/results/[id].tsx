@@ -56,21 +56,19 @@ export default function ResultsScreen() {
         <FlatList
           data={projectDetails.assignments}
           keyExtractor={(assignment) => assignment.fromName.toString()}
-          renderItem={({ item }) => {
-            return (
-              <View style={globalStyles.itemContainer}>
-                <Text style={globalStyles.item}>{item.fromName}</Text>
-                {revealedAssignments[item.fromName] && <Text>{item.toName}</Text>}
-                <TouchableOpacity onPress={() => toggleReveal(item.fromName)}>
-                  <Ionicons
-                    name={revealedAssignments[item.fromName] ? "eye-off-outline" : "eye-outline"}
-                    size={20}
-                    color="#007bff"
-                  />
-                </TouchableOpacity>
-              </View>
-            );
-          }}
+          renderItem={({ item }) => (
+            <View style={globalStyles.itemContainer}>
+              <Text style={globalStyles.item}>{item.fromName}</Text>
+              {revealedAssignments[item.fromName] && <Text>{item.toName}</Text>}
+              <TouchableOpacity onPress={() => toggleReveal(item.fromName)}>
+                <Ionicons
+                  name={revealedAssignments[item.fromName] ? "eye-off-outline" : "eye-outline"}
+                  size={20}
+                  color="#007bff"
+                />
+              </TouchableOpacity>
+            </View>
+          )}
         />
         <View style={globalStyles.footer}>
           <TouchableOpacity
