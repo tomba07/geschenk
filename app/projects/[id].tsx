@@ -1,5 +1,5 @@
 import { apiService } from "@/utils/apiService";
-import { BEParticipant, ProjectDetails, Participant } from "@/utils/interfaces";
+import { BEParticipant, ProjectDetails, Participant, SimplifiedAssignment } from "@/utils/interfaces";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { View, Text, FlatList, TextInput, Button, TouchableOpacity } from "react-native";
@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "@/utils/styles";
 import { useEditMode } from "@/utils/context/EditModeContext";
+import { findMatches } from "@/utils/SecretSantaMatcher";
 
 export default function ParticipantsScreen() {
   let { id: projectId } = useLocalSearchParams();
@@ -45,6 +46,32 @@ export default function ParticipantsScreen() {
       setParticipantName("");
       bottomSheetRef.current?.close();
       fetchProjectDetails({ projectId: projectIdAsNum });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const assignParticipants = async () => {
+    const participants: Participant[] = projectDetails.participants.map((participant) => {
+      return { name: participant.name, excludes: [] };
+    });
+
+    const assignments: SimplifiedAssignment[] = findMatches(participants);
+    await createAssignments(assignments);
+
+    // Navigate to ResultsScreen to view assignments
+    router.replace(`/results/${projectId}` as const);
+  };
+
+  const createAssignments = async (simplifiedAssignments: SimplifiedAssignment[]) => {
+    const assignments = simplifiedAssignments.map((assignment) => {
+      return {
+        ...assignment,
+        projectId: projectIdAsNum,
+      };
+    });
+    try {
+      await apiService.createAssignments({ assignments, projectId: projectIdAsNum });
     } catch (error) {
       console.error(error);
     }
@@ -111,9 +138,12 @@ export default function ParticipantsScreen() {
               disabled={selectedParticipants.size === 0}
             />
           ) : (
-            <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
-              <Ionicons name="person-add-outline" size={20} color="#007bff" />
-            </TouchableOpacity>
+            <>
+              <Button title="Assign" onPress={assignParticipants} />
+              <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
+                <Ionicons name="person-add-outline" size={20} color="#007bff" />
+              </TouchableOpacity>
+            </>
           )}
         </View>
 
