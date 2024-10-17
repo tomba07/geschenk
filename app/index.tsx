@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { TouchableOpacity, View, Text, FlatList, Button } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -9,6 +9,7 @@ import { Project } from "@/utils/interfaces";
 import { globalStyles } from "@/utils/styles";
 import { CustomBottomSheet } from "@/components/BottomSheet";
 import { useEditMode } from "@/utils/context/EditModeContext";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function App() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -20,6 +21,7 @@ export default function App() {
   const [selectedProjects, setSelectedProjects] = useState<Set<number>>(new Set());
 
   const fetchProjects = async () => {
+    setLoading(true);
     const beProjects = await apiService.getProjects();
     setProjects(beProjects);
     setLoading(false);
@@ -37,9 +39,11 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchProjects();
+    }, [])
+  );
 
   const handlePress = (item: Project) => {
     if (item.assigned) {
@@ -66,7 +70,6 @@ export default function App() {
       await apiService.deleteProject({ projectId });
       fetchProjects();
     }
-    fetchProjects();
     setSelectedProjects(new Set());
   };
 
