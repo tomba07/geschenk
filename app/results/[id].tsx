@@ -73,13 +73,10 @@ export default function ResultsScreen() {
             <View style={globalStyles.itemContainer}>
               <Text style={globalStyles.item}>{item.fromName}</Text>
               {revealedAssignments[item.fromName] && <Text>{item.toName}</Text>}
-              <TouchableOpacity onPress={() => toggleReveal(item.fromName)}>
-                <Ionicons
-                  name={revealedAssignments[item.fromName] ? "eye-off-outline" : "eye-outline"}
-                  size={20}
-                  color="#007bff"
-                />
-              </TouchableOpacity>
+              <Button
+                title={revealedAssignments[item.fromName] ? "Hide" : "Reveal"}
+                onPress={() => toggleReveal(item.fromName)}
+              />
             </View>
           )}
         />
