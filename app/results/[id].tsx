@@ -1,8 +1,8 @@
 import { apiService } from "@/utils/apiService";
 import { ProjectDetails } from "@/utils/interfaces";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Button } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Button, Alert } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "@/utils/styles";
@@ -22,7 +22,6 @@ export default function ResultsScreen() {
   });
   const [revealedAssignments, setRevealedAssignments] = useState<{ [key: string]: boolean }>({});
   const navigation = useNavigation();
-  const router = useRouter();
 
   useEffect(() => {
     fetchProjectDetails({ projectId: projectIdAsNum });
@@ -36,10 +35,27 @@ export default function ResultsScreen() {
   };
 
   const toggleReveal = (assignmentFromName: string) => {
-    setRevealedAssignments((prevRevealed) => ({
-      ...prevRevealed,
-      [assignmentFromName]: !prevRevealed[assignmentFromName],
-    }));
+    if (!revealedAssignments[assignmentFromName]) {
+      Alert.alert(`Are you "${assignmentFromName}"?`, undefined, [
+        {
+          text: 'No',
+          onPress: () => console.log('No'),
+        },
+        {
+          text: 'Yes', onPress: () => {
+            setRevealedAssignments((prevRevealed) => ({
+              ...prevRevealed,
+              [assignmentFromName]: !prevRevealed[assignmentFromName],
+            }));
+          }
+        },
+      ]);
+    } else {
+      setRevealedAssignments((prevRevealed) => ({
+        ...prevRevealed,
+        [assignmentFromName]: !prevRevealed[assignmentFromName],
+      }));
+    }
   };
 
   return (
