@@ -2,7 +2,7 @@ import { apiService } from "@/utils/apiService";
 import { BEParticipant, ProjectDetails, Participant, SimplifiedAssignment } from "@/utils/interfaces";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { View, Text, FlatList, TextInput, Button, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, TextInput, Button, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
@@ -52,15 +52,27 @@ export default function ParticipantsScreen() {
   };
 
   const assignParticipants = async () => {
-    const participants: Participant[] = projectDetails.participants.map((participant) => {
-      return { name: participant.name, excludes: [] };
-    });
+    Alert.alert('Are you sure?', 'Once you assign participants, you cannot edit them anymore.', [
+      {
+        text: 'Cancel',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel',
+      },
+      {
+        text: 'OK', onPress: async () => {
+          const participants: Participant[] = projectDetails.participants.map((participant) => {
+            return { name: participant.name, excludes: [] };
+          });
 
-    const assignments: SimplifiedAssignment[] = findMatches(participants);
-    await createAssignments(assignments);
+          const assignments: SimplifiedAssignment[] = findMatches(participants);
+          await createAssignments(assignments);
 
-    // Navigate to ResultsScreen to view assignments
-    router.replace(`/results/${projectId}` as const);
+          // Navigate to ResultsScreen to view assignments
+          router.replace(`/results/${projectId}` as const);
+        }
+      },
+    ]);
+
   };
 
   const createAssignments = async (simplifiedAssignments: SimplifiedAssignment[]) => {
