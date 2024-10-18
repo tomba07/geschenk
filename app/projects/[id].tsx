@@ -97,6 +97,7 @@ export default function ParticipantsScreen() {
     }
     fetchProjectDetails({ projectId: projectIdAsNum });
     setSelectedParticipants(new Set());
+    setIsEditMode(false);
   };
 
   return (

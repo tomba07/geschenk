@@ -2,7 +2,7 @@ import { apiService } from "@/utils/apiService";
 import { ProjectDetails } from "@/utils/interfaces";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Button } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "@/utils/styles";
@@ -68,7 +68,8 @@ export default function ResultsScreen() {
           )}
         />
         <View style={globalStyles.footer}>
-          <TouchableOpacity
+          <Button
+            title="Copy Link to Project"
             onPress={async () => {
               const fullRoute = Linking.createURL(`/projects/${projectId}`);
               await Clipboard.setStringAsync(fullRoute);
@@ -76,9 +77,7 @@ export default function ResultsScreen() {
                 text1: "Link copied to clipboard!",
               });
             }}
-          >
-            <Ionicons name="share-outline" size={20} color="#007bff" />
-          </TouchableOpacity>
+          />
         </View>
         <Toast />
       </View>

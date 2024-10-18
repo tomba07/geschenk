@@ -17,7 +17,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const router = useRouter();
-  const { isEditMode } = useEditMode();
+  const { isEditMode, setIsEditMode } = useEditMode();
   const [selectedProjects, setSelectedProjects] = useState<Set<number>>(new Set());
 
   const fetchProjects = async () => {
@@ -71,6 +71,7 @@ export default function App() {
       fetchProjects();
     }
     setSelectedProjects(new Set());
+    setIsEditMode(false);
   };
 
   return (
