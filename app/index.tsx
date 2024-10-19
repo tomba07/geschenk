@@ -1,5 +1,12 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { TouchableOpacity, View, Text, FlatList, Button, ActivityIndicator } from "react-native";
+import React, { useRef, useState, useCallback } from "react";
+import {
+  TouchableOpacity,
+  View,
+  Text,
+  FlatList,
+  Button,
+  ActivityIndicator,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -10,6 +17,7 @@ import { globalStyles } from "@/utils/styles";
 import { CustomBottomSheet } from "@/components/BottomSheet";
 import { useEditMode } from "@/utils/context/EditModeContext";
 import { useFocusEffect } from "@react-navigation/native";
+
 
 export default function App() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -22,8 +30,12 @@ export default function App() {
 
   const fetchProjects = async () => {
     setLoading(true);
-    const beProjects = await apiService.getProjects();
-    setProjects(beProjects);
+    try {
+      const beProjects = await apiService.getProjects();
+      setProjects(beProjects);
+    } catch (error) {
+      console.error("Failed to fetch projects:", error);
+    }
     setLoading(false);
   };
 
