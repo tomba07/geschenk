@@ -10,12 +10,12 @@ export interface Participant {
 }
 
 export interface BEParticipant {
-  projectId: Number;
+  projectId: String;
   name: string;
 }
 
 export interface ProjectDetails {
-  id: Number;
+  id: String;
   name: string;
   participants: Participant[];
   assignments: Assignment[];

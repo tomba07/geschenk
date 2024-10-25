@@ -12,10 +12,10 @@ import { findMatches } from "@/utils/SecretSantaMatcher";
 
 export default function ParticipantsScreen() {
   let { id: projectId } = useLocalSearchParams();
-  const projectIdAsNum = Number(projectId);
+  projectId = projectId as string;
   const [loading, setLoading] = useState(true);
   const [projectDetails, setProjectDetails] = useState<ProjectDetails>({
-    id: projectIdAsNum,
+    id: projectId,
     name: "",
     participants: [],
     assignments: [],
@@ -29,10 +29,10 @@ export default function ParticipantsScreen() {
   const [selectedParticipants, setSelectedParticipants] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    fetchProjectDetails({ projectId: projectIdAsNum });
+    fetchProjectDetails({ projectId });
   }, []);
 
-  const fetchProjectDetails = async ({ projectId }: { projectId: Number }) => {
+  const fetchProjectDetails = async ({ projectId }: { projectId: string }) => {
     const projectDetails = await apiService.getProjectDetails({ projectId });
     setProjectDetails(projectDetails);
     navigation.setOptions({ title: projectDetails.name });
@@ -40,12 +40,12 @@ export default function ParticipantsScreen() {
   };
 
   const createParticipant = async () => {
-    const participant: BEParticipant = { name: participantName, projectId: projectIdAsNum };
+    const participant: BEParticipant = { name: participantName, projectId };
     try {
       await apiService.createParticipant({ participant });
       setParticipantName("");
       bottomSheetRef.current?.close();
-      fetchProjectDetails({ projectId: projectIdAsNum });
+      fetchProjectDetails({ projectId });
     } catch (error) {
       console.error(error);
     }
@@ -79,11 +79,11 @@ export default function ParticipantsScreen() {
     const assignments = simplifiedAssignments.map((assignment) => {
       return {
         ...assignment,
-        projectId: projectIdAsNum,
+        projectId,
       };
     });
     try {
-      await apiService.createAssignments({ assignments, projectId: projectIdAsNum });
+      await apiService.createAssignments({ assignments, projectId });
     } catch (error) {
       console.error(error);
     }
@@ -105,9 +105,9 @@ export default function ParticipantsScreen() {
   // Delete selected participants
   const deleteSelectedParticipants = async () => {
     for (const name of selectedParticipants) {
-      await apiService.deleteParticipant({ name, projectId: projectIdAsNum });
+      await apiService.deleteParticipant({ name, projectId });
     }
-    fetchProjectDetails({ projectId: projectIdAsNum });
+    fetchProjectDetails({ projectId });
     setSelectedParticipants(new Set());
     setIsEditMode(false);
   };
