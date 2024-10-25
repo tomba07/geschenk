@@ -149,7 +149,7 @@ export default function ParticipantsScreen() {
             />
           ) : (
             <>
-              <Button title="Assign" onPress={assignParticipants} />
+              <Button disabled={projectDetails.participants.length <= 2} title="Assign" onPress={assignParticipants} />
               <TouchableOpacity onPress={() => bottomSheetRef.current?.expand()}>
                 <Ionicons name="person-add-outline" size={20} color="#007bff" />
               </TouchableOpacity>

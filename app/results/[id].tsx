@@ -2,9 +2,8 @@ import { apiService } from "@/utils/apiService";
 import { ProjectDetails } from "@/utils/interfaces";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Button, Alert } from "react-native";
+import { View, Text, FlatList, ActivityIndicator, Button, Alert } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Ionicons } from "@expo/vector-icons";
 import { globalStyles } from "@/utils/styles";
 import * as Clipboard from "expo-clipboard";
 import Toast from "react-native-toast-message";
@@ -12,10 +11,10 @@ import * as Linking from "expo-linking";
 
 export default function ResultsScreen() {
   let { id: projectId } = useLocalSearchParams();
-  const projectIdAsNum = Number(projectId);
+  projectId = projectId as string;
   const [loading, setLoading] = useState(true);
   const [projectDetails, setProjectDetails] = useState<ProjectDetails>({
-    id: projectIdAsNum,
+    id: projectId,
     name: "",
     participants: [],
     assignments: [],
@@ -24,10 +23,10 @@ export default function ResultsScreen() {
   const navigation = useNavigation();
 
   useEffect(() => {
-    fetchProjectDetails({ projectId: projectIdAsNum });
+    fetchProjectDetails({ projectId });
   }, []);
 
-  const fetchProjectDetails = async ({ projectId }: { projectId: Number }) => {
+  const fetchProjectDetails = async ({ projectId }: { projectId: string }) => {
     const projectDetails = await apiService.getProjectDetails({ projectId });
     setProjectDetails(projectDetails);
     navigation.setOptions({ title: projectDetails.name });
