@@ -3,7 +3,7 @@ import { Assignment, BEParticipant } from "./interfaces";
 import getUserId from "./userIdService";
 import { getCachedUserId } from "./userIdService";
 
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const createUser = async () => {
     console.log("createUser called");
