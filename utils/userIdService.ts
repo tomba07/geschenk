@@ -10,6 +10,7 @@ const getUserId = async () => {
 
       if (!userId) {
         userId = uuid.v4() as string;
+        await SecureStore.setItemAsync("USER_ID", userId);
       }
 
       cachedUserId = userId;
