@@ -30,7 +30,7 @@ export const CustomBottomSheet: React.FC<ReusableBottomSheetProps> = ({
     <BottomSheet
       ref={bottomSheetRef}
       index={-1}
-      snapPoints={["10%", "30%"]}
+      snapPoints={["20%", "80%"]}
       onChange={(index) => {
         if (index > 0) {
           inputRef.current?.focus();
